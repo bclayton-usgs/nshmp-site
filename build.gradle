@@ -19,5 +19,9 @@ repositories {
 
 dependencies {
   providedCompile 'org.apache.tomcat:tomcat-catalina:8.0.45'
-  compile 'com.google.guava:guava:24.1-jre'
+  compile project(':nshmp-haz')
+}
+
+war {
+  webAppDirName = 'webapp'
 }
