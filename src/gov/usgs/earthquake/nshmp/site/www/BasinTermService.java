@@ -47,9 +47,9 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class BasinTermService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final String NAME = "Basin Term Service";
-	private static final String DESCRIPTION = "Get basin terms";
-	private static final String SYNTAX = "%s://%s/nshmp-site" +
+	private static final String SERVICE_NAME = "Basin Term Service";
+	private static final String SERVICE_DESCRIPTION = "Get basin terms";
+	private static final String SERVICE_SYNTAX = "%s://%s/nshmp-site" +
 	      "?latitude={latitude}" +
 	      "&longitude={longitude}" + 
 	      "&model={basinModel}";
@@ -93,9 +93,9 @@ public class BasinTermService extends HttpServlet {
         writer.printf(GSON.toJson(new Metadata()), protocol, host);
         return;
       }
-	  
-      RequestData requestData = buildRequest(request.getParameterMap());
-      Response svcResponse = processBasinTerm(requestData, requestUrl);
+
+      Map<String, String[]> paramMap = request.getParameterMap();
+      Response svcResponse = processBasinTerm(paramMap, requestUrl);
       String json = GeoJson.cleanPoly(GSON.toJson(svcResponse));
       writer.println(json);
     } catch(Exception e) {
@@ -106,30 +106,66 @@ public class BasinTermService extends HttpServlet {
 	/**
 	 * Obtain the basin terms from {@link ArcGis#callService(double, double)} 
 	 *     and return {@code Response} with only the {@code BasinModels} of interest.
+	 * <br>
+	 * If the latitude and longitude supplied in the query is not contained 
+	 *     in a {@code BasinRegion}, the {@link ArcGis#callPointService}
+	 *     is not called and the resulting z1p0 and z2p5 values are set to 
+	 *     null using {@link BasinTermService#processNullResult}.
 	 *     
 	 * @param requestData - The {@code RequestData} 
 	 * @param requestUrl - The full request url
 	 * @return The {@code Response} to turn into JSON.
 	 * @throws IOException
 	 */
-	private Response processBasinTerm(RequestData requestData, String requestUrl) 
+	private Response processBasinTerm(Map<String, String[]> paramMap, String requestUrl) 
 	    throws IOException {
-	  ArcGisResult arcGisResult = ArcGis.callService(
-	      requestData.latitude, 
-	      requestData.longitude);
 	  
-	  Double z1p0Val = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
-	  z1p0Val = requestData.basinRegion.equals(null) ? null : z1p0Val;
-	  Double z2p5Val = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
-	  z2p5Val = requestData.basinRegion.equals(null) ? null : z2p5Val;
+	  RequestData requestData = buildRequest(paramMap);
 	  
-	  BasinResponse z1p0 = new BasinResponse(requestData.basinModel.z1p0, z1p0Val);
+	  if (requestData.basinRegion == null) {
+	    return processNullResult(requestData, requestUrl);
+	  }
+	  
+    ArcGisResult arcGisResult = ArcGis.callPointService(
+        requestData.latitude, 
+        requestData.longitude);
+   
+    double lat = arcGisResult.latitude;
+    double lon = arcGisResult.longitude;
+    
+    Double z1p0Val = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
+    Double z2p5Val = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
+	  
+    BasinResponse z1p0 = new BasinResponse(requestData.basinModel.z1p0, z1p0Val);
 	  BasinResponse z2p5 = new BasinResponse(requestData.basinModel.z2p5, z2p5Val);
 	  
-	  ResponseData responseData = new ResponseData(z1p0, z2p5);
-	  Response response = new Response(requestData, responseData, requestUrl);
+	  ResponseData responseData = new ResponseData(lat, lon, z1p0, z2p5);
 	  
-	  return response;
+	  return new Response(requestData, responseData, requestUrl);
+	}
+	
+	/**
+	 * Convience method to return null values for z1p0 and z2p5.
+	 * <br>
+	 * Called when the supplied latitude and longitude is not contained in 
+	 *     any {@code BasinRegion}.
+	 *     
+	 * @param requestData - The {@link RequestData}
+	 * @param requestUrl - The query string
+	 * @return A new {@link Response} with null values.
+	 */
+	private static Response processNullResult(
+	    RequestData requestData, 
+	    String requestUrl) {
+	  double lat = requestData.latitude;
+	  double lon = requestData.longitude;
+	  
+	  BasinResponse z1p0 = new BasinResponse("", null);
+	  BasinResponse z2p5 = new BasinResponse("", null);
+	  
+	  ResponseData responseData = new ResponseData(lat, lon, z1p0, z2p5);
+	  
+	  return new Response(requestData, responseData, requestUrl);
 	}
 	
 	/**
@@ -142,9 +178,10 @@ public class BasinTermService extends HttpServlet {
 	private static RequestData buildRequest(Map<String, String[]> paramMap) {
 	  double lat = Double.valueOf(Util.readValue(paramMap, Key.LATITUDE));
 	  double lon = Double.valueOf(Util.readValue(paramMap, Key.LONGITUDE));
-	  BasinRegion basinRegion = BasinRegion.findRegion(lat, lon);
 	  
-	  BasinModel basinModel = getBasinModel(basinRegion, paramMap); 
+	  BasinRegion basinRegion = BasinRegion.findRegion(lat, lon);
+	  BasinModel basinModel = basinRegion == null ? null : 
+	      getBasinModel(basinRegion, paramMap); 
 	  
 	  return new RequestData(basinRegion, basinModel, lat, lon);
 	}
@@ -158,7 +195,7 @@ public class BasinTermService extends HttpServlet {
 	private static BasinModel getBasinModel(
 	    BasinRegion basinRegion, 
 	    Map<String, String[]> paramMap) {
-	  Boolean hasBasinModel = paramMap.containsKey(Key.MODEL.toString());
+	  Boolean hasBasinModel = paramMap.containsKey(Util.toLowerCase(Key.MODEL));
 	  
 	  return hasBasinModel ? 
 	      BasinModel.fromId(Util.readValue(paramMap, Key.MODEL)) :
@@ -213,10 +250,14 @@ public class BasinTermService extends HttpServlet {
 	 *     </ul> 
 	 */
 	private static class ResponseData {
+	  double latitude;
+	  double longitude;
 	  BasinResponse z1p0;
 	  BasinResponse z2p5;
 	  
-	  ResponseData(BasinResponse z1p0, BasinResponse z2p5) {
+	  ResponseData(double lat, double lon, BasinResponse z1p0, BasinResponse z2p5) {
+	    this.latitude = lat;
+	    this.longitude = lon;
 	    this.z1p0 = z1p0;
 	    this.z2p5 = z2p5;
 	  }
@@ -258,8 +299,8 @@ public class BasinTermService extends HttpServlet {
 	  final ResponseData response;
 	  
 	  Response(RequestData requestData, ResponseData responseData, String url) {
-	    this.status = Status.SUCCESS.toString();
-	    this.name = NAME;
+	    this.status = Util.toLowerCase(Status.SUCCESS);
+	    this.name = SERVICE_NAME;
 	    this.date = new Date().toString();
 	    this.url = url;
 	    this.request = requestData;
@@ -285,10 +326,10 @@ public class BasinTermService extends HttpServlet {
 	  final FeatureCollection<Feature> geoJson;
 	  
 	  Metadata() {
-	    this.status = Status.USAGE.toString();
-	    this.name = NAME;
-	    this.description = DESCRIPTION;
-	    this.syntax = SYNTAX;
+	    this.status = Util.toLowerCase(Status.USAGE);
+	    this.name = SERVICE_NAME;
+	    this.description = SERVICE_DESCRIPTION;
+	    this.syntax = SERVICE_SYNTAX;
 	    
 	    this.basinModels = new EnumParameter<>(
 	        "Basin models",
