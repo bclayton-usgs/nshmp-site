@@ -30,22 +30,68 @@ public class ArcGis {
    * @return The {@code ArcGisResult} with basin terms.
    * @throws IOException
    */
-  static ArcGisResult callService(double latitude, double longitude) 
+  static ArcGisResult callPointService(double latitude, double longitude) 
       throws IOException {
+    final double threshold = 0.001;
+    
+    double latMinus = latitude - threshold;
+    double latPlus = latitude + threshold;
+    double lonMinus = longitude - threshold;
+    double lonPlus = longitude + threshold;
+    
     String urlStr = SERVICE_URL + 
-        "geometry=" + longitude + "," + latitude + 
+        "geometryType=esriGeometryEnvelope" +
+        "&geometry=" + lonMinus + "," + latMinus +  "," +
+        lonPlus + "," + latPlus +
         "&tolerance=1&mapExtent=1&imageDisplay=1&f=json";
     
     URL url = new URL(urlStr);
     InputStreamReader reader = new InputStreamReader(url.openStream());
     final ArcGisReturn svcReturn = GSON.fromJson(reader, ArcGisReturn.class);
+    reader.close();
     ArcGisResult svcResult = null;
+    
     try {
       svcResult = svcReturn.results.get(0);
     } catch (Exception e) {
       throw new IllegalStateException("No result from: " + urlStr);
     }
+    
     return svcResult;
+  }
+ 
+  /**
+   * Call the identify ArcGis Online web service for envelope of points
+   *    and return a {@code ArcGisReturn}.
+   * <br>
+   * Deserialization of the ArcGis JSON response is conducted throw,
+   *    {@link Util.ArcGisDeserializer}.
+   *    
+   * @param minlatitude - The minimum latitude in degrees of a location.
+   * @param maxlatitude - The maximum latitude in degrees of a location.
+   * @param minlongitude - The minimum longitude in degrees of a location.
+   * @param maxlongitude - The maximum longitude in degrees of a location.
+   * @return The {@code ArcGisReturn} with basin terms.
+   * @throws IOException
+   */
+  static ArcGisReturn callEnvelopeService(
+      double minlatitude,
+      double maxlatitude,
+      double minlongitude,
+      double maxlongitude) throws IOException {
+    
+    String urlStr = SERVICE_URL + 
+        "geometryType=esriGeometryEnvelope" +
+        "&geometry=" + minlongitude + "," + minlatitude +  "," +
+        maxlongitude + "," + maxlatitude +
+        "&tolerance=1&mapExtent=1&imageDisplay=1&f=json";
+    
+    URL url = new URL(urlStr);
+    InputStreamReader reader = new InputStreamReader(url.openStream());
+    final ArcGisReturn svcReturn = GSON.fromJson(reader, ArcGisReturn.class);
+    reader.close();
+    
+    return svcReturn;
   }
   
   /**
@@ -64,14 +110,21 @@ public class ArcGis {
    */
   static class ArcGisResult {
     double vs30;
+    double latitude;
+    double longitude;
     Map<String, Double> basinModels;
-    
+   
     void setVs30(double vs30) {
       this.vs30 = vs30;
     }
     
     void setBasinModels(Map<String, Double> basinModels) {
       this.basinModels = basinModels;
+    }
+    
+    void setCoordinates(double lat, double lon) {
+      this.latitude = lat;
+      this.longitude = lon;
     }
   }
   

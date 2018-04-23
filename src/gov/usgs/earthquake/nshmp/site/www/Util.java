@@ -1,5 +1,6 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -56,6 +57,8 @@ public class Util {
   enum Key {
     /* ArcGIS Service Keys */
     ATTRIBUTES,
+    LAT,
+    LON,
     VS30,
     Z1P0,
     Z2P5,
@@ -64,21 +67,6 @@ public class Util {
     LATITUDE,
     LONGITUDE,
     MODEL;
-    
-    /**
-     * Convert the {@code Enum} to a upper camel case {@code String}.
-     */
-    String toUpperCamel() {
-      return UPPER_UNDERSCORE.to(UPPER_CAMEL, name());
-    }
-   
-    /**
-     * Convert the {@code Enum} to a lower case {@code String}.
-     */
-    @Override
-    public String toString() {
-      return name().toLowerCase();
-    }
   }
   
   /**
@@ -88,16 +76,48 @@ public class Util {
     ERROR,
     SUCCESS,
     USAGE;
-    
-    /**
-     * Convert the {@code Enum} to a lower case {@code String}.
-     */
-    @Override 
-    public String toString() {
-      return name().toLowerCase();
-    }
+  }
+  
+  /**
+   * Return a lower case {@code String} from an {@code Enum}. 
+   * @param e
+   * @return The lower case string
+   */
+  public static <E extends Enum<E>> String toLowerCase(E e) {
+    return e.name().toLowerCase();
   }
  
+  /**
+   * Return a lower camel case {@code String} from an {@code Enum}.
+   * @param e
+   * @return The lower camel case string.
+   */
+  public static <E extends Enum<E>> String toLowerCamelCase(E e) {
+    return UPPER_UNDERSCORE.to(LOWER_CAMEL, e.name());
+  }
+ 
+  /**
+   * Return a upper camel case {@code String} from an {@code Enum}.
+   * @param e
+   * @return The upper camel case string.
+   */
+  public static <E extends Enum<E>> String toUpperCamelCase(E e) {
+    return UPPER_UNDERSCORE.to(UPPER_CAMEL, e.name());
+  }
+  
+  /**
+   * Container class for an {@code Enum}. 
+   */
+  static class EnumParameter<E extends Enum<E>>{
+    final String label;
+    final Set<E> values;
+    
+    EnumParameter(String label, Set<E> values) {
+      this.label = label;
+      this.values = values;
+    }
+  }
+  
   /**
    * Return the {@code String} value of the matching {@value Key}
    *    in a {@code HttpServletRequest.getParameterMap()}.
@@ -107,7 +127,7 @@ public class Util {
    * @return The value associated with the key.
    */
   static String readValue(Map<String, String[]> paramMap, Key key) {
-    String keyStr = key.toString();
+    String keyStr = toLowerCase(key);
     String[] values = paramMap.get(keyStr);
     checkNotNull(values, "Missing query key: %s", keyStr);
     checkState(!isNullOrEmpty(values[0]), "Empty value array for key: %s", key);
@@ -115,6 +135,34 @@ public class Util {
     return values[0];
   }
  
+  /**
+   * Convenience method to read in values from the ArcGis service return
+   * @param json
+   * @param key
+   * @return
+   */
+  static Double readArcValue(JsonObject json, String key) {
+    JsonElement jsonEl = json.get(key);
+    System.out.println(jsonEl);
+    checkNotNull(jsonEl, "Could not get key from the ArcGis Online Service return: %s", key);
+    Double val = jsonEl.getAsDouble();
+    
+    return Double.isNaN(val) ? null : val;
+  }
+  
+  /**
+   * Attributes for serialization and deserializtion. 
+   */
+  private enum Attr {
+    DEFAULT_MODEL,
+    ID,
+    LABEL,
+    MINLATITUDE,
+    MAXLATITUDE,
+    MINLONGITUDE,
+    MAXLONGITUDE;
+  }
+  
   /**
    * A {@code JsonSerializer} for {@code BasinRegions} 
    */
@@ -129,13 +177,13 @@ public class Util {
   
       JsonObject json = new JsonObject();
   
-      json.addProperty("label", basinRegion.label);
-      json.addProperty("id", basinRegion.id);
-      json.addProperty("minlatitude", basinRegion.minlatitude);
-      json.addProperty("maxlatitude", basinRegion.maxlatitude);
-      json.addProperty("minlongitude", basinRegion.minlongitude);
-      json.addProperty("maxlongitude", basinRegion.maxlongitude);
-      json.addProperty("defaultModel", basinRegion.defaultModel.id);
+      json.addProperty(toLowerCamelCase(Attr.LABEL), basinRegion.label);
+      json.addProperty(toLowerCamelCase(Attr.ID), basinRegion.id);
+      json.addProperty(toLowerCamelCase(Attr.MINLATITUDE), basinRegion.minlatitude);
+      json.addProperty(toLowerCamelCase(Attr.MAXLATITUDE), basinRegion.maxlatitude);
+      json.addProperty(toLowerCamelCase(Attr.MINLONGITUDE), basinRegion.minlongitude);
+      json.addProperty(toLowerCamelCase(Attr.MAXLONGITUDE), basinRegion.maxlongitude);
+      json.addProperty(toLowerCamelCase(Attr.DEFAULT_MODEL), basinRegion.defaultModel.id);
   
       return json;
     }
@@ -155,9 +203,9 @@ public class Util {
   
       JsonObject json = new JsonObject();
   
-      json.addProperty("id", basinModel.id);
-      json.addProperty("z1p0", basinModel.z1p0);
-      json.addProperty("z2p5", basinModel.z2p5);
+      json.addProperty(toLowerCamelCase(Attr.ID), basinModel.id);
+      json.addProperty(toLowerCamelCase(Key.Z1P0), basinModel.z1p0);
+      json.addProperty(toLowerCamelCase(Key.Z2P5), basinModel.z2p5);
   
       return json;
     }
@@ -174,28 +222,31 @@ public class Util {
         JsonDeserializationContext context) throws JsonParseException {
   
       JsonObject jsonObject = json.getAsJsonObject();
-      JsonObject attributesJson = jsonObject.get(Key.ATTRIBUTES.toString())
+      JsonObject attributesJson = jsonObject.get(toLowerCase(Key.ATTRIBUTES))
           .getAsJsonObject();
       Map<String, Double> basinModels = new HashMap<>();
   
       for (String key : attributesJson.keySet()) {
-        if (key.contains(Key.Z1P0.toUpperCamel()) || 
-            key.contains(Key.Z2P5.toUpperCamel())) {
-          Double value = attributesJson.get(key).getAsDouble();
-          value = Double.isNaN(value) ? null : value;
+        if (key.contains(toUpperCamelCase(Key.Z1P0)) || 
+            key.contains(toUpperCamelCase(Key.Z2P5))) {
+          Double value = readArcValue(attributesJson, key); 
           basinModels.put(key, value);
         }
       }
- 
-      double vs30 = attributesJson.get(Key.VS30.toUpperCamel()).getAsDouble();
+      
+      double vs30 = readArcValue(attributesJson, toUpperCamelCase(Key.VS30)); 
+      double lat = readArcValue(attributesJson, toUpperCamelCase(Key.LAT));
+      double lon = readArcValue(attributesJson, toUpperCamelCase(Key.LON));
+      
       ArcGisResult result = new ArcGisResult();
       result.setBasinModels(basinModels);
       result.setVs30(vs30);
+      result.setCoordinates(lat, lon);
   
       return result;
     }
   }
- 
+  
   /**
    * Method for obtaining error messages in JSON format. 
    * @param url - The URL that threw an error
@@ -216,22 +267,9 @@ public class Util {
     final String message;
     
     private Error(String request, Throwable e) {
-      this.status = Status.ERROR.toString();
+      this.status = toLowerCase(Status.ERROR);
       this.request = request;
       this.message = e.getMessage();
-    }
-  }
-  
-  /**
-   * Container class for a {@code Enum}. 
-   */
-  static class EnumParameter<E extends Enum<E>>{
-    final String label;
-    final Set<E> values;
-    
-    EnumParameter(String label, Set<E> values) {
-      this.label = label;
-      this.values = values;
     }
   }
   

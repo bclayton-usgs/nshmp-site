@@ -1,8 +1,5 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +75,7 @@ public enum BasinRegion {
       double[] lonRange,
       BasinModel defaultModel) {
     this.label = label;
-    this.id = this.toUpperCamel();
+    this.id = Util.toUpperCamelCase(this);
     
     this.minlatitude = latRange[0];
     this.maxlatitude = latRange[1];
@@ -87,13 +84,6 @@ public enum BasinRegion {
     this.defaultModel = defaultModel;
     
     this.region = this.createRegion();
-  }
-  
-  /**
-   * Convert the {@code Enum} to a lower camel case {@code String}.
-   */
-  String toUpperCamel() {
-    return UPPER_UNDERSCORE.to(LOWER_CAMEL, name());
   }
   
   /**
