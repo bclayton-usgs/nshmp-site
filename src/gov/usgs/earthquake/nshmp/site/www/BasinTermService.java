@@ -96,7 +96,7 @@ public class BasinTermService extends HttpServlet {
 
       Map<String, String[]> paramMap = request.getParameterMap();
       Response svcResponse = processBasinTerm(paramMap, requestUrl);
-      String json = GeoJson.cleanPoly(GSON.toJson(svcResponse));
+      String json = GSON.toJson(svcResponse);
       writer.println(json);
     } catch(Exception e) {
       writer.println(Util.errorMessage(requestUrl, e));
@@ -323,7 +323,6 @@ public class BasinTermService extends HttpServlet {
 	  final String syntax;
 	  final EnumParameter<BasinModel> basinModels; 
 	  final EnumParameter<BasinRegion> basinRegions; 
-	  final FeatureCollection<Feature> geoJson;
 	  
 	  Metadata() {
 	    this.status = Util.toLowerCase(Status.USAGE);
@@ -338,8 +337,6 @@ public class BasinTermService extends HttpServlet {
 	    this.basinRegions = new EnumParameter<>(
 	        "Basin regions",
 	        EnumSet.allOf(BasinRegion.class));
-	    
-	    this.geoJson = BasinRegion.toFeatureCollection();
 	  }
 	}
 

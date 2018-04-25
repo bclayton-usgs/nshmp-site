@@ -121,6 +121,7 @@ public enum BasinRegion {
    * 
    * @return The polygon {@code Feature}.
    */
+  /*
   Feature toPolygonFeature() {
     ArrayList<Location> locs = new ArrayList<>();
     locs.add(Location.create(this.minlatitude, this.minlongitude));
@@ -138,12 +139,14 @@ public enum BasinRegion {
     
     return feature;
   }
+  */
   
   /**
    * Create a {@code FeatureCollection} of all {@code BasinRegion}.
    * 
    * @return The {@code FeatureCollection}.
    */
+  /*
   static FeatureCollection<Feature> toFeatureCollection() {
     List<Feature> features = new ArrayList<>();
     
@@ -156,6 +159,7 @@ public enum BasinRegion {
     
     return fc;
   }
+  */
   
   /**
    * Container class for the {@code FeatureCollection} properties. 
