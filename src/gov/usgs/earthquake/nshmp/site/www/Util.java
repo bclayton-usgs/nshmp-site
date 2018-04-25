@@ -143,7 +143,6 @@ public class Util {
    */
   static Double readArcValue(JsonObject json, String key) {
     JsonElement jsonEl = json.get(key);
-    System.out.println(jsonEl);
     checkNotNull(jsonEl, "Could not get key from the ArcGis Online Service return: %s", key);
     Double val = jsonEl.getAsDouble();
     
