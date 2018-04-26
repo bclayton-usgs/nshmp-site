@@ -1,7 +1,23 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
 /**
- * Basin models
+ * Basin models to obtain basin terms.
+ * <br><br>
+ * 
+ * Models include:
+ *    <ul>
+ *      <li> bayarea </li>
+ *      <li> cca06 </li>
+ *      <li> cvh1510 </li>
+ *      <li> cvms4 </li>
+ *      <li> cvms426 </li>
+ *      <li> cvms426m01 </li>
+ *      <li> linthurber </li>
+ *      <li> SchmandtLin </li>
+ *      <li> Seattle </li>
+ *      <li> SchenRitzwoller </li>
+ *      <li> Wasatch </li>
+ *    </ul>
  * 
  * @author Brandon Clayton
  */
@@ -18,11 +34,21 @@ public enum BasinModel {
   SEATTLE("Seattle"),
   SCHEN_RITZWOLLER("SchenRitzwoller"),
   WASATCH("Wasatch");
-  
+ 
+  /**
+   *  The {@code BasinModel} id taken from the {@link ArcGis} web service 
+   *    return without the Z1p0 or Z2p5 prepended to it.
+   */
   public String id;
+  /** The {@code BasinModel} Z1p0 id */
   public String z1p0;
+  /** The {@code BasinModel} Z2p5 id */
   public String z2p5;
-  
+ 
+  /**
+   * Create a new {@code BasinModel} {@code enum}.
+   * @param id The {@code BasinModel} id
+   */
   private BasinModel(String id) {
     this.id = id;
     this.z1p0 = "Z1p0" + id;
@@ -31,15 +57,18 @@ public enum BasinModel {
   
   /**
    * Given a basin model id, find and return the corresponding
-   *    {@code BasinModels}
-   *    
+   *    {@code BasinModel}
+   * 
    * @param modelId - The basin model id.
-   * @return The {@code BasinModels} associated with model id.
+   * @return The {@code BasinModel} associated with model id.
+   * @throws IllegalStateException If not {@code BasinModel} is found.
    */
-  static BasinModel fromId(String modelId) {
+  public static BasinModel fromId(String modelId) {
+    
     for (BasinModel basin : values()) {
       if (basin.id.equals(modelId)) return basin; 
     }
+    
     throw new IllegalStateException("Basin model does not exist: " + modelId);
   }
   
