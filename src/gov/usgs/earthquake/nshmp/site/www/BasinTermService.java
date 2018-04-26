@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -12,30 +13,50 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import gov.usgs.earthquake.nshmp.internal.GeoJson;
-import gov.usgs.earthquake.nshmp.internal.GeoJson.Feature;
-import gov.usgs.earthquake.nshmp.internal.GeoJson.FeatureCollection;
+import gov.usgs.earthquake.nshmp.geo.Location;
 import gov.usgs.earthquake.nshmp.site.www.ArcGis.ArcGisResult;
+import gov.usgs.earthquake.nshmp.site.www.Basins.BasinRegion;
 import gov.usgs.earthquake.nshmp.site.www.Util.EnumParameter;
 import gov.usgs.earthquake.nshmp.site.www.Util.Key;
 import gov.usgs.earthquake.nshmp.site.www.Util.Status;
 
+import static gov.usgs.earthquake.nshmp.json.Util.cleanPoly;
 import static gov.usgs.earthquake.nshmp.site.www.Util.GSON;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * Web service for getting basin terms for {@code BasinModels} 
- *    and {@code BasinRegions}.
- * <br> 
- * The basin terms are produced from the ArcGis Online web service, 
- *    {@link ArcGis}.
+ * Web service for getting basin terms for {@link BasinModel}s 
+ *    and {@link BasinRegion}s.
+ * <br> <br>
+ * 
+ * The basin terms are produced from the {@link ArcGis} Online web service.
+ * <br><br>
+ * 
+ * Usage: /nshmp-site-ws/basin
+ * <br><br>
+ * 
+ * GeoJson: /nshmp-site-ws/basin/geojson
+ * <br><br>
+ * 
+ * Syntax: /nshmp-site-ws/basin?latitude={latitude}&amp;
+ *    longitude={longitude}&amp;model={basinModel}
  * <br>
- * Syntax: /nshmp-site/basin?latitude={latitude}&longitude={longitude}
- *    &model={basinModel}
+ * Where: 
+ *    <ul> 
+ *      <li> latitude is in degrees </li>
+ *      <li> longitude is in degrees </li>
+ *      <li> model is one of the {@link BasinModel}s </li>
+ *    </ul>
  * <br>
- * Example: /nshmp-site/basin?latitude=47&longitude=-122.5&model=Seattle 
- *    
+ * 
+ * NOTE: Latitude and longitude must be supplied. If model is not supplied the 
+ *    default model is used as defined in the basins.geojson file. 
+ * <br><br>
+ * 
+ * Example: /nshmp-site-ws/basin?latitude=47&amp;longitude=-122.5&amp;model=Seattle 
+ * <br><br>
+ *   
  * @author Brandon Clayton
  */
 @WebServlet(
@@ -46,18 +67,31 @@ import static com.google.common.base.Strings.isNullOrEmpty;
         "/basin/*"})
 public class BasinTermService extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+
+	/** Web service name */
 	private static final String SERVICE_NAME = "Basin Term Service";
+	/** Web service description */
 	private static final String SERVICE_DESCRIPTION = "Get basin terms";
-	private static final String SERVICE_SYNTAX = "%s://%s/nshmp-site" +
+	/** Web service url syntax */
+	private static final String SERVICE_SYNTAX = "%s://%s/nshmp-site-ws/basin" +
 	      "?latitude={latitude}" +
 	      "&longitude={longitude}" + 
 	      "&model={basinModel}";
+	/** Web service usage url */
+	private static final String SERVICE_USAGE = "%s://%s/nshmp-site-ws/basin";
+	/** URL to return basins.geojson */
+	private static final String SERVICE_GEOJSON = "%s://%s/nshmp-site-ws/basin/geojson";
 	
 	/**
 	 * Handle the GET request and return JSON response. 
-	 * <br>
-	 * If the query string is empty then the JSON response is the {@link Metadata}.
+	 * <br><br>
+	 * 
+	 * Different responses:
+	 *   <ul>
+	 *     <li> path info equals geojson: the basins.geojson file </li>
+	 *     <li> query empty: {@link Metadata} </li>
+	 *     <li> query not empty: {@link Response} </li>
+	 *   </ul>
 	 */
 	@Override
 	protected void doGet(
@@ -89,14 +123,21 @@ public class BasinTermService extends HttpServlet {
     requestUrl = requestUrl.replace("http://", protocol + "://");
     
     try {
-      if (isNullOrEmpty(query)) {
-        writer.printf(GSON.toJson(new Metadata()), protocol, host);
+      if (!isNullOrEmpty(pathInfo) && pathInfo.equals("/geojson")) {
+        Basins basins = Basins.getBasins();
+        writer.println(basins.featureCollection.toJsonString());
         return;
       }
-
+      
+      if (isNullOrEmpty(query)) {
+        writer.printf(cleanPoly(GSON.toJson(new Metadata())), 
+            protocol, host, protocol, host, protocol, host);
+        return;
+      }
+      
       Map<String, String[]> paramMap = request.getParameterMap();
       Response svcResponse = processBasinTerm(paramMap, requestUrl);
-      String json = GSON.toJson(svcResponse);
+      String json = cleanPoly(GSON.toJson(svcResponse));
       writer.println(json);
     } catch(Exception e) {
       writer.println(Util.errorMessage(requestUrl, e));
@@ -104,31 +145,33 @@ public class BasinTermService extends HttpServlet {
 	}
 	
 	/**
-	 * Obtain the basin terms from {@link ArcGis#callService(double, double)} 
-	 *     and return {@code Response} with only the {@code BasinModels} of interest.
-	 * <br>
+	 * Process query and obtain the basin terms 
+	 *     from {@link ArcGis#callPointService(double, double)} 
+	 *     and return {@link Response} with only the {@link BasinModel} of interest.
+	 * <br><br>
+	 * 
 	 * If the latitude and longitude supplied in the query is not contained 
 	 *     in a {@code BasinRegion}, the {@link ArcGis#callPointService}
 	 *     is not called and the resulting z1p0 and z2p5 values are set to 
-	 *     null using {@link BasinTermService#processNullResult}.
+	 *     {@code null} using {@link BasinTermService#processNullResult}.
 	 *     
-	 * @param requestData - The {@code RequestData} 
-	 * @param requestUrl - The full request url
+	 * @param paramMap - The {@code HttpServletRequest} parameter map,
+	 *     {@code Map<String, String[]>}.
+	 * @param requestUrl - The full request url.
 	 * @return The {@code Response} to turn into JSON.
-	 * @throws IOException
 	 */
-	private Response processBasinTerm(Map<String, String[]> paramMap, String requestUrl) 
-	    throws IOException {
+	private Response processBasinTerm(
+	    Map<String, String[]> paramMap, 
+	    String requestUrl) {
 	  
 	  RequestData requestData = buildRequest(paramMap);
 	  
 	  if (requestData.basinRegion == null) {
 	    return processNullResult(requestData, requestUrl);
 	  }
-	  
-    ArcGisResult arcGisResult = ArcGis.callPointService(
-        requestData.latitude, 
-        requestData.longitude);
+	 
+	  Location loc = Location.create(requestData.latitude, requestData.longitude);
+    ArcGisResult arcGisResult = ArcGis.callPointService(loc);
    
     double lat = arcGisResult.latitude;
     double lon = arcGisResult.longitude;
@@ -146,9 +189,10 @@ public class BasinTermService extends HttpServlet {
 	
 	/**
 	 * Convience method to return null values for z1p0 and z2p5.
-	 * <br>
+	 * <br><br>
+	 * 
 	 * Called when the supplied latitude and longitude is not contained in 
-	 *     any {@code BasinRegion}.
+	 *     any {@link BasinRegion}.
 	 *     
 	 * @param requestData - The {@link RequestData}
 	 * @param requestUrl - The query string
@@ -169,7 +213,7 @@ public class BasinTermService extends HttpServlet {
 	}
 	
 	/**
-	 * Return {@code RequestData} by getting the parameters from the 
+	 * Return {@link RequestData} by getting the parameters from the 
 	 *     {@code HttpServletRequest.getParameterMap()}.
 	 *     
 	 * @param paramMap The request parameter map.
@@ -178,8 +222,9 @@ public class BasinTermService extends HttpServlet {
 	private static RequestData buildRequest(Map<String, String[]> paramMap) {
 	  double lat = Double.valueOf(Util.readValue(paramMap, Key.LATITUDE));
 	  double lon = Double.valueOf(Util.readValue(paramMap, Key.LONGITUDE));
-	  
-	  BasinRegion basinRegion = BasinRegion.findRegion(lat, lon);
+	 
+	  Basins basins = Basins.getBasins();
+	  BasinRegion basinRegion = basins.findRegion(lat, lon);
 	  BasinModel basinModel = basinRegion == null ? null : 
 	      getBasinModel(basinRegion, paramMap); 
 	  
@@ -187,7 +232,9 @@ public class BasinTermService extends HttpServlet {
 	}
 
 	/**
-	 * Return 
+	 * Return a {@link BasinModel} based on if the {@link BasinRegion} was
+	 *     found or the "model" key appears in the query string. 
+	 *     
 	 * @param basinRegion
 	 * @param paramMap
 	 * @return
@@ -207,8 +254,8 @@ public class BasinTermService extends HttpServlet {
 	 *     <ul>
 	 *       <li> latitude - {@code double} </li>
 	 *       <li> longitude - {@code double} </li>
-	 *       <li> basinModel - {@code BasinModels} </li>
-	 *       <li> BasinRegion - {@code BasinRegions} </li>
+	 *       <li> {@link BasinModel} </li>
+	 *       <li> {@link BasinRegion} </li>
 	 *     </ul>
 	 */
 	private static class RequestData {
@@ -230,7 +277,7 @@ public class BasinTermService extends HttpServlet {
 	}
 	
 	/**
-	 * Container class to hold information for each basin term. 
+	 * Container class to hold information for each basin term, z1p0 and z2p5. 
 	 */
 	private static class BasinResponse {
 	  String model;
@@ -312,31 +359,34 @@ public class BasinTermService extends HttpServlet {
 	 * Container to produce the {@code BasinTermService} usage that shows:
 	 *     <ul>
 	 *       <li> All basin models - {@code EnumSet.of(BasinModels)} </li>
-	 *       <li> All basin regions - {@code EnumSet.of(BasinRegions} </li>
-	 *       <li> GeoJson feature collection - {@link BasinRegion#toFeatureCollection()} </li>
+	 *       <li> All basin regions - {@code List<BasinRegion>} </li>
 	 *     </ul> 
 	 */
 	private static class Metadata {
 	  final String status;
 	  final String name;
 	  final String description;
+	  final String usage;
+	  final String geojson;
 	  final String syntax;
 	  final EnumParameter<BasinModel> basinModels; 
-	  final EnumParameter<BasinRegion> basinRegions; 
+	  final List<BasinRegion> basinRegions; 
 	  
 	  Metadata() {
+	    Basins basins = Basins.getBasins();
+	    
 	    this.status = Util.toLowerCase(Status.USAGE);
 	    this.name = SERVICE_NAME;
 	    this.description = SERVICE_DESCRIPTION;
+	    this.usage = SERVICE_USAGE;
+	    this.geojson = SERVICE_GEOJSON;
 	    this.syntax = SERVICE_SYNTAX;
 	    
 	    this.basinModels = new EnumParameter<>(
 	        "Basin models",
 	        EnumSet.allOf(BasinModel.class));
-	    
-	    this.basinRegions = new EnumParameter<>(
-	        "Basin regions",
-	        EnumSet.allOf(BasinRegion.class));
+
+      this.basinRegions = basins.basinRegions;
 	  }
 	}
 
