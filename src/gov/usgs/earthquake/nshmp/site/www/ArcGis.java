@@ -3,15 +3,25 @@ package gov.usgs.earthquake.nshmp.site.www;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import gov.usgs.earthquake.nshmp.geo.Location;
 
 import static gov.usgs.earthquake.nshmp.site.www.Util.GSON;
 
 /**
  * Class to handle all calls to the ArcGis Online service:
  *  https://dev-earthquake.cr.usgs.gov/arcgis/rest/services/haz/basin/MapServer/identify
- *   
+ * <br><br>
+ * 
+ * To call the service with a point: {@link #callPointService(Location)}
+ * <br><br>
+ * 
+ * To call the service with a envelope of points: 
+ *    {@link #callEnvelopeService(double, double, double, double)}.
+ * <br>
+ * 
  * @author Brandon Clayton
  */
 public class ArcGis {
@@ -21,18 +31,24 @@ public class ArcGis {
   /**
    * Call the identify ArcGis Online web service for a single point location
    *    and return a {@code ArcGisResult}.
-   * <br>
-   * Deserialization of the ArcGis JSON response is conducted throw,
+   * <br><br>
+   * 
+   * Deserialization of the ArcGis JSON response is conducted threw,
    *    {@link Util.ArcGisDeserializer}.
+   * <br><br>
+   * 
+   * NOTE: Currently the ArcGis service cannot handle values
+   *    to the tenth, to combat this a envelope of points is used using 
+   *    a +- 0.001 degrees.
    *    
    * @param latitude - The latitude in degrees of a location.
    * @param longitude - The longitude in degrees of a location.
    * @return The {@code ArcGisResult} with basin terms.
-   * @throws IOException
    */
-  static ArcGisResult callPointService(double latitude, double longitude) 
-      throws IOException {
+  static ArcGisResult callPointService(Location loc) {
     final double threshold = 0.001;
+    final double latitude = loc.lat();
+    final double longitude = loc.lon();
     
     double latMinus = latitude - threshold;
     double latPlus = latitude + threshold;
@@ -45,19 +61,18 @@ public class ArcGis {
         lonPlus + "," + latPlus +
         "&tolerance=1&mapExtent=1&imageDisplay=1&f=json";
     
-    URL url = new URL(urlStr);
-    InputStreamReader reader = new InputStreamReader(url.openStream());
-    final ArcGisReturn svcReturn = GSON.fromJson(reader, ArcGisReturn.class);
-    reader.close();
-    ArcGisResult svcResult = null;
-    
     try {
-      svcResult = svcReturn.results.get(0);
-    } catch (Exception e) {
-      throw new IllegalStateException("No result from: " + urlStr);
+      URL url = new URL(urlStr);
+      InputStreamReader reader = new InputStreamReader(url.openStream());
+      final ArcGisReturn svcReturn = GSON.fromJson(reader, ArcGisReturn.class);
+      reader.close();
+      
+      return svcReturn.results.get(0);
+    } catch (IOException ioe) {
+      throw new RuntimeException("Could not reach: " + urlStr);
+    } catch (IndexOutOfBoundsException e) {
+      throw new RuntimeException("Empty results array returned from: " + urlStr);
     }
-    
-    return svcResult;
   }
  
   /**
@@ -79,7 +94,11 @@ public class ArcGis {
       double maxlatitude,
       double minlongitude,
       double maxlongitude) throws IOException {
-    
+   /* TODO
+    * - Handle exceptions better using try catch
+    * - Use LocationList?
+    * - Add service to handle this call
+    */
     String urlStr = SERVICE_URL + 
         "geometryType=esriGeometryEnvelope" +
         "&geometry=" + minlongitude + "," + minlatitude +  "," +
@@ -100,7 +119,7 @@ public class ArcGis {
    * The container class is used in the {@link Util.ArcGisDeserializer}. 
    */
   static class ArcGisReturn {
-    ArrayList<ArcGisResult> results;
+    List<ArcGisResult> results;
   }
  
   /**
