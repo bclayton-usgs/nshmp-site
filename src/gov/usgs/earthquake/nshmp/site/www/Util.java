@@ -33,7 +33,6 @@ public class Util {
   /**
    * A {@code Gson} instance with serializers and deserializers:
    *    <ul> 
-   *      <li> {@link BasinRegionSerializer} </li>
    *      <li> {@link BasinModelSerializer} </li>
    *      <li> {@link ArcGisDeserializer} </li>
    *    </ul>
@@ -42,7 +41,6 @@ public class Util {
   
   static {
     GSON = new GsonBuilder()
-        .registerTypeAdapter(BasinRegion.class, new BasinRegionSerializer())
         .registerTypeAdapter(BasinModel.class, new BasinModelSerializer())
         .registerTypeAdapter(ArcGisResult.class, new ArcGisDeserializer())
         .disableHtmlEscaping()
@@ -80,7 +78,7 @@ public class Util {
   
   /**
    * Return a lower case {@code String} from an {@code Enum}. 
-   * @param e
+   * @param e The {@code Enum}
    * @return The lower case string
    */
   public static <E extends Enum<E>> String toLowerCase(E e) {
@@ -89,7 +87,7 @@ public class Util {
  
   /**
    * Return a lower camel case {@code String} from an {@code Enum}.
-   * @param e
+   * @param e The {@code Enum}
    * @return The lower camel case string.
    */
   public static <E extends Enum<E>> String toLowerCamelCase(E e) {
@@ -98,7 +96,7 @@ public class Util {
  
   /**
    * Return a upper camel case {@code String} from an {@code Enum}.
-   * @param e
+   * @param e The {@code Enum}
    * @return The upper camel case string.
    */
   public static <E extends Enum<E>> String toUpperCamelCase(E e) {
@@ -162,32 +160,6 @@ public class Util {
     MAXLONGITUDE;
   }
   
-  /**
-   * A {@code JsonSerializer} for {@code BasinRegions} 
-   */
-  private static final class BasinRegionSerializer 
-      implements JsonSerializer<BasinRegion> {
-
-    @Override
-    public JsonElement serialize(
-        BasinRegion basinRegion, 
-        Type typeOfSrc, 
-        JsonSerializationContext context) {
-  
-      JsonObject json = new JsonObject();
-  
-      json.addProperty(toLowerCamelCase(Attr.LABEL), basinRegion.label);
-      json.addProperty(toLowerCamelCase(Attr.ID), basinRegion.id);
-      json.addProperty(toLowerCamelCase(Attr.MINLATITUDE), basinRegion.minlatitude);
-      json.addProperty(toLowerCamelCase(Attr.MAXLATITUDE), basinRegion.maxlatitude);
-      json.addProperty(toLowerCamelCase(Attr.MINLONGITUDE), basinRegion.minlongitude);
-      json.addProperty(toLowerCamelCase(Attr.MAXLONGITUDE), basinRegion.maxlongitude);
-      json.addProperty(toLowerCamelCase(Attr.DEFAULT_MODEL), basinRegion.defaultModel.id);
-  
-      return json;
-    }
-  }
-
   /**
    * A {@code JsonSerializer} for {@code BasinModels} 
    */
