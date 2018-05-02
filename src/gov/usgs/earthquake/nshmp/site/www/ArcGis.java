@@ -46,19 +46,12 @@ public class ArcGis {
    * @return The {@code ArcGisResult} with basin terms.
    */
   static ArcGisResult callPointService(Location loc) {
-    final double threshold = 0.001;
     final double latitude = loc.lat();
     final double longitude = loc.lon();
     
-    double latMinus = latitude - threshold;
-    double latPlus = latitude + threshold;
-    double lonMinus = longitude - threshold;
-    double lonPlus = longitude + threshold;
-    
     String urlStr = SERVICE_URL + 
-        "geometryType=esriGeometryEnvelope" +
-        "&geometry=" + lonMinus + "," + latMinus +  "," +
-        lonPlus + "," + latPlus +
+        "geometryType=esriGeometryPoint" +
+        "&geometry=" + longitude + "," + latitude +
         "&tolerance=1&mapExtent=1&imageDisplay=1&f=json";
     
     try {
@@ -120,6 +113,10 @@ public class ArcGis {
    */
   static class ArcGisReturn {
     List<ArcGisResult> results;
+    
+    String toJsonString() {
+      return Util.GSON.toJson(this, ArcGisResult.class);
+    }
   }
  
   /**
@@ -128,22 +125,18 @@ public class ArcGis {
    * The container class is used in the {@link Util.ArcGisDeserializer}. 
    */
   static class ArcGisResult {
-    double vs30;
     double latitude;
     double longitude;
     Map<String, Double> basinModels;
-   
-    void setVs30(double vs30) {
-      this.vs30 = vs30;
-    }
-    
-    void setBasinModels(Map<String, Double> basinModels) {
+  
+    ArcGisResult(Map<String, Double> basinModels, double latitude, double longitude) {
       this.basinModels = basinModels;
+      this.latitude = latitude;
+      this.longitude = longitude;
     }
     
-    void setCoordinates(double lat, double lon) {
-      this.latitude = lat;
-      this.longitude = lon;
+    String toJsonString() {
+      return Util.GSON.toJson(this, ArcGisResult.class);
     }
   }
   

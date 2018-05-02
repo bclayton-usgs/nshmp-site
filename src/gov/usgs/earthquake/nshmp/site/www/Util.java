@@ -8,9 +8,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -57,6 +57,7 @@ public class Util {
     ATTRIBUTES,
     LAT,
     LON,
+    NULL,
     VS30,
     Z1P0,
     Z2P5,
@@ -142,9 +143,10 @@ public class Util {
   static Double readArcValue(JsonObject json, String key) {
     JsonElement jsonEl = json.get(key);
     checkNotNull(jsonEl, "Could not get key from the ArcGis Online Service return: %s", key);
-    Double val = jsonEl.getAsDouble();
+    Double val = jsonEl.getAsString().equals(toUpperCamelCase(Key.NULL)) ? 
+        null : jsonEl.getAsDouble(); 
     
-    return Double.isNaN(val) ? null : val;
+    return val;
   }
   
   /**
@@ -153,11 +155,7 @@ public class Util {
   private enum Attr {
     DEFAULT_MODEL,
     ID,
-    LABEL,
-    MINLATITUDE,
-    MAXLATITUDE,
-    MINLONGITUDE,
-    MAXLONGITUDE;
+    LABEL;
   }
   
   /**
@@ -195,24 +193,20 @@ public class Util {
       JsonObject jsonObject = json.getAsJsonObject();
       JsonObject attributesJson = jsonObject.get(toLowerCase(Key.ATTRIBUTES))
           .getAsJsonObject();
-      Map<String, Double> basinModels = new HashMap<>();
+      Map<String, Double> basinModels = new TreeMap<>();
   
       for (String key : attributesJson.keySet()) {
-        if (key.contains(toUpperCamelCase(Key.Z1P0)) || 
-            key.contains(toUpperCamelCase(Key.Z2P5))) {
+        if (key.contains(toLowerCamelCase(Key.Z1P0)) || 
+            key.contains(toLowerCamelCase(Key.Z2P5))) {
           Double value = readArcValue(attributesJson, key); 
           basinModels.put(key, value);
         }
       }
       
-      double vs30 = readArcValue(attributesJson, toUpperCamelCase(Key.VS30)); 
-      double lat = readArcValue(attributesJson, toUpperCamelCase(Key.LAT));
-      double lon = readArcValue(attributesJson, toUpperCamelCase(Key.LON));
+      double latitude = readArcValue(attributesJson, toUpperCamelCase(Key.LAT));
+      double longitude = readArcValue(attributesJson, toUpperCamelCase(Key.LON));
       
-      ArcGisResult result = new ArcGisResult();
-      result.setBasinModels(basinModels);
-      result.setVs30(vs30);
-      result.setCoordinates(lat, lon);
+      ArcGisResult result = new ArcGisResult(basinModels, latitude, longitude);
   
       return result;
     }
