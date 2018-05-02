@@ -103,8 +103,8 @@ public class Basins {
    * @return The {@code BasinRegion} that contains the specific 
    *    location or {@code null}.
    */
-  public BasinRegion findRegion(double lat, double lon) {
-    Location loc = Location.create(lat, lon);
+  public BasinRegion findRegion(double latitude, double longitude) {
+    Location loc = Location.create(latitude, longitude);
     return this.findRegion(loc);
   }
   

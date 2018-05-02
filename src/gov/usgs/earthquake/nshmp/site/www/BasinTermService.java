@@ -173,16 +173,13 @@ public class BasinTermService extends HttpServlet {
 	  Location loc = Location.create(requestData.latitude, requestData.longitude);
     ArcGisResult arcGisResult = ArcGis.callPointService(loc);
    
-    double lat = arcGisResult.latitude;
-    double lon = arcGisResult.longitude;
-    
     Double z1p0Val = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
     Double z2p5Val = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
 	  
     BasinResponse z1p0 = new BasinResponse(requestData.basinModel.z1p0, z1p0Val);
 	  BasinResponse z2p5 = new BasinResponse(requestData.basinModel.z2p5, z2p5Val);
 	  
-	  ResponseData responseData = new ResponseData(lat, lon, z1p0, z2p5);
+	  ResponseData responseData = new ResponseData(z1p0, z2p5);
 	  
 	  return new Response(requestData, responseData, requestUrl);
 	}
@@ -201,13 +198,10 @@ public class BasinTermService extends HttpServlet {
 	private static Response processNullResult(
 	    RequestData requestData, 
 	    String requestUrl) {
-	  double lat = requestData.latitude;
-	  double lon = requestData.longitude;
-	  
 	  BasinResponse z1p0 = new BasinResponse("", null);
 	  BasinResponse z2p5 = new BasinResponse("", null);
 	  
-	  ResponseData responseData = new ResponseData(lat, lon, z1p0, z2p5);
+	  ResponseData responseData = new ResponseData(z1p0, z2p5);
 	  
 	  return new Response(requestData, responseData, requestUrl);
 	}
@@ -220,15 +214,15 @@ public class BasinTermService extends HttpServlet {
 	 * @return A new instance of {@code RequestData}
 	 */
 	private static RequestData buildRequest(Map<String, String[]> paramMap) {
-	  double lat = Double.valueOf(Util.readValue(paramMap, Key.LATITUDE));
-	  double lon = Double.valueOf(Util.readValue(paramMap, Key.LONGITUDE));
+	  double latitude = Double.valueOf(Util.readValue(paramMap, Key.LATITUDE));
+	  double longitude = Double.valueOf(Util.readValue(paramMap, Key.LONGITUDE));
 	 
 	  Basins basins = Basins.getBasins();
-	  BasinRegion basinRegion = basins.findRegion(lat, lon);
+	  BasinRegion basinRegion = basins.findRegion(latitude, longitude);
 	  BasinModel basinModel = basinRegion == null ? null : 
 	      getBasinModel(basinRegion, paramMap); 
 	  
-	  return new RequestData(basinRegion, basinModel, lat, lon);
+	  return new RequestData(basinRegion, basinModel, latitude, longitude);
 	}
 
 	/**
@@ -280,8 +274,8 @@ public class BasinTermService extends HttpServlet {
 	 * Container class to hold information for each basin term, z1p0 and z2p5. 
 	 */
 	private static class BasinResponse {
-	  String model;
-	  Double value;
+	  final String model;
+	  final Double value;
 	 
 	  BasinResponse(String model, Double value) {
 	    this.model = model;
@@ -297,14 +291,10 @@ public class BasinTermService extends HttpServlet {
 	 *     </ul> 
 	 */
 	private static class ResponseData {
-	  double latitude;
-	  double longitude;
-	  BasinResponse z1p0;
-	  BasinResponse z2p5;
+	  final BasinResponse z1p0;
+	  final BasinResponse z2p5;
 	  
-	  ResponseData(double lat, double lon, BasinResponse z1p0, BasinResponse z2p5) {
-	    this.latitude = lat;
-	    this.longitude = lon;
+	  ResponseData(BasinResponse z1p0, BasinResponse z2p5) {
 	    this.z1p0 = z1p0;
 	    this.z2p5 = z2p5;
 	  }

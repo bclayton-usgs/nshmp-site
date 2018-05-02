@@ -37,7 +37,7 @@ public enum BasinModel {
  
   /**
    *  The {@code BasinModel} id taken from the {@link ArcGis} web service 
-   *    return without the Z1p0 or Z2p5 prepended to it.
+   *    return without the "z1p0-" or "z2p5-" prepended to it.
    */
   public String id;
   /** The {@code BasinModel} Z1p0 id */
@@ -51,8 +51,8 @@ public enum BasinModel {
    */
   private BasinModel(String id) {
     this.id = id;
-    this.z1p0 = "Z1p0" + id;
-    this.z2p5 = "Z2p5" + id;
+    this.z1p0 = "z1p0-" + id;
+    this.z2p5 = "z2p5-" + id;
   }
   
   /**
@@ -61,7 +61,7 @@ public enum BasinModel {
    * 
    * @param modelId - The basin model id.
    * @return The {@code BasinModel} associated with model id.
-   * @throws IllegalStateException If not {@code BasinModel} is found.
+   * @throws RuntimeException If {@code BasinModel} is not found.
    */
   public static BasinModel fromId(String modelId) {
     
@@ -69,7 +69,7 @@ public enum BasinModel {
       if (basin.id.equals(modelId)) return basin; 
     }
     
-    throw new IllegalStateException("Basin model does not exist: " + modelId);
+    throw new RuntimeException("Basin model does not exist: " + modelId);
   }
   
 }
