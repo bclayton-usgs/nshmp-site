@@ -104,22 +104,20 @@ public class BasinTermService extends HttpServlet {
 	  String query = request.getQueryString();
 	  String pathInfo = request.getPathInfo();
 	  String host = request.getServerName();
-	  String requestUrl = request.getRequestURL()
-	      .append("?")
-	      .append(query)
-	      .toString();
 	  
 	  /*
      * Checking custom header for a forwarded protocol so generated links can
      * use the same protocol and not cause mixed content errors.
      */
-    String protocol = request.getHeader("X-FORWARDED-PROTO");
+	  String protocol = request.getHeader("X-FORWARDED-PROTO");
     if (protocol == null) {
-      /* Not a forwarded request. Honor reported protocol and port. */
       protocol = request.getScheme();
       host += ":" + request.getServerPort();
     }
     
+    StringBuffer urlBuf = request.getRequestURL();
+    if (query != null) urlBuf.append("?").append(query);
+    String requestUrl = urlBuf.toString();
     requestUrl = requestUrl.replace("http://", protocol + "://");
     
     try {
