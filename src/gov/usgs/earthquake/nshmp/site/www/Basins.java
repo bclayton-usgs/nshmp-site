@@ -74,6 +74,10 @@ public class Basins {
   public static Basins getBasins() {
     try {
       URL url = Basins.class.getResource(BASIN_FILE);
+      if (url == null) {
+        throw new RuntimeException("Could not find: " + BASIN_FILE);
+      }
+      
       InputStreamReader reader = new InputStreamReader(url.openStream());
       FeatureCollection fc = FeatureCollection.read(reader);
       reader.close();
@@ -85,7 +89,7 @@ public class Basins {
       }
     
       return new Basins(basinBuilder.build(), fc);
-    } catch (IOException ioe) {
+    } catch (IOException | NullPointerException e) {
       throw new RuntimeException("Could not read in " + BASIN_FILE);
     }
   }
