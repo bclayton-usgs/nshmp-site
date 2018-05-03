@@ -125,12 +125,18 @@ public class ArcGis {
    * The container class is used in the {@link Util.ArcGisDeserializer}. 
    */
   static class ArcGisResult {
-    double latitude;
-    double longitude;
-    Map<String, Double> basinModels;
+    final double latitude;
+    final double longitude;
+    final double vs30;
+    final Map<String, Double> basinModels;
   
-    ArcGisResult(Map<String, Double> basinModels, double latitude, double longitude) {
+    ArcGisResult(
+        Map<String, Double> basinModels, 
+        double vs30,
+        double latitude, 
+        double longitude) {
       this.basinModels = basinModels;
+      this.vs30 = vs30;
       this.latitude = latitude;
       this.longitude = longitude;
     }

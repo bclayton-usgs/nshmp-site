@@ -179,7 +179,7 @@ public class BasinTermService extends HttpServlet {
 	  
 	  ResponseData responseData = new ResponseData(z1p0, z2p5);
 	  
-	  return new Response(requestData, responseData, requestUrl);
+	  return new Response(requestData, responseData, arcGisResult, requestUrl);
 	}
 	
 	/**
@@ -201,7 +201,7 @@ public class BasinTermService extends HttpServlet {
 	  
 	  ResponseData responseData = new ResponseData(z1p0, z2p5);
 	  
-	  return new Response(requestData, responseData, requestUrl);
+	  return new Response(requestData, responseData, null, requestUrl);
 	}
 	
 	/**
@@ -332,14 +332,20 @@ public class BasinTermService extends HttpServlet {
 	  final String url;
 	  final RequestData request;
 	  final ResponseData response;
+	  final ArcGisResult arcGisResponse;
 	  
-	  Response(RequestData requestData, ResponseData responseData, String url) {
+	  Response(
+	      RequestData requestData, 
+	      ResponseData responseData, 
+	      ArcGisResult arcGisResponse,
+	      String url) {
 	    this.status = Util.toLowerCase(Status.SUCCESS);
 	    this.name = SERVICE_NAME;
 	    this.date = new Date().toString();
 	    this.url = url;
 	    this.request = requestData;
 	    this.response = responseData;
+	    this.arcGisResponse = arcGisResponse;
 	  }
 	}
 	

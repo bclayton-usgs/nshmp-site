@@ -202,11 +202,12 @@ public class Util {
           basinModels.put(key, value);
         }
       }
-      
+     
+      double vs30 = readArcValue(attributesJson, toUpperCamelCase(Key.VS30));
       double latitude = readArcValue(attributesJson, toUpperCamelCase(Key.LAT));
       double longitude = readArcValue(attributesJson, toUpperCamelCase(Key.LON));
       
-      ArcGisResult result = new ArcGisResult(basinModels, latitude, longitude);
+      ArcGisResult result = new ArcGisResult(basinModels, vs30, latitude, longitude);
   
       return result;
     }
