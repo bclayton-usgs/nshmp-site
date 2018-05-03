@@ -51,8 +51,8 @@ public enum BasinModel {
    */
   private BasinModel(String id) {
     this.id = id;
-    this.z1p0 = "z1p0-" + id;
-    this.z2p5 = "z2p5-" + id;
+    this.z1p0 = "z1p0" + id;
+    this.z2p5 = "z2p5" + id;
   }
   
   /**
