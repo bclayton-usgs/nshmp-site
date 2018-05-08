@@ -181,7 +181,6 @@ public class BasinTermService extends HttpServlet {
      */
     if (requestData.basinRegion.id.equals("pugetLowland")) {
       z1p0 = 0.1039 * z2p5 + 0.2029;
-      System.out.println("hello PNW");
     }
     
     BasinResponse z1p0resp = new BasinResponse(requestData.basinModel.z1p0, z1p0);
