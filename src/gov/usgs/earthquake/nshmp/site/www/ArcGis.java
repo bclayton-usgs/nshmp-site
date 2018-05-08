@@ -25,7 +25,7 @@ import static gov.usgs.earthquake.nshmp.site.www.Util.GSON;
  * @author Brandon Clayton
  */
 public class ArcGis {
-  private static final String SERVICE_URL = "https://dev-earthquake.cr.usgs.gov/" +
+  private static final String SERVICE_URL = "https://dev01-gis01.cr.usgs.gov/" +
       "arcgis/rest/services/haz/basin/MapServer/identify?"; 
   
   /**
