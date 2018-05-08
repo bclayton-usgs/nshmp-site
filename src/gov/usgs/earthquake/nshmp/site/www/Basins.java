@@ -84,7 +84,7 @@ public class Basins {
     
       ImmutableList.Builder<BasinRegion> basinBuilder = ImmutableList.builder();
     
-      for (Feature feature : fc.features) {
+      for (Feature feature : fc.getFeatures()) {
         basinBuilder.add(new BasinRegion(feature));
       }
     
@@ -129,7 +129,7 @@ public class Basins {
     for (BasinRegion basin : this.basinRegions) {
       Region region = Regions.create(
           "basin", 
-          basin.geometry.toLocationList(), 
+          basin.geometry.getBorder(), 
           BorderType.MERCATOR_LINEAR);
       Boolean isContained = region.contains(loc);
       if (isContained) return basin;
@@ -191,16 +191,18 @@ public class Basins {
      * @param feature The {@link Feature}
      */
     private BasinRegion(Feature feature) {
-      Properties properties = Properties.builder()
-          .putAll(feature.properties)
-          .build();
       
-      String modelId = (String) properties.getProperty("defaultModel");
+//      Properties properties = Properties.builder()
+//          .putAll(feature.properties)
+//          .build();
+      Properties properties = feature.getProperties();
+
+      String modelId = properties.getStringProperty("defaultModel");
 
       this.geometry = getGeometry(feature); 
       this.defaultModel = BasinModel.fromId(modelId);
-      this.title = (String) properties.getProperty("title");
-      this.id = (String) properties.getProperty("id");
+      this.title = properties.getStringProperty("title");
+      this.id = properties.getStringProperty("id");
     }
     
     /**
@@ -222,13 +224,15 @@ public class Basins {
    * @return The {@code Polygon}
    */
   private static Polygon getGeometry(Feature feature) {
-    GeoJsonType type = GeoJsonType.getEnum(feature.geometry.getType());
+    return feature.getGeometry().asPolygon();
     
-    if (type.equals(GeoJsonType.POLYGON)) {
-      return (Polygon) feature.geometry;
-    }
-    
-    throw new IllegalStateException("Could not find a polygon geometry");
+//    GeoJsonType type = GeoJsonType.getEnum(feature.geometry.getType());
+//    
+//    if (type.equals(GeoJsonType.POLYGON)) {
+//      return (Polygon) feature.geometry;
+//    }
+//    
+//    throw new IllegalStateException("Could not find a polygon geometry");
   }
 
 }
