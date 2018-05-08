@@ -171,13 +171,23 @@ public class BasinTermService extends HttpServlet {
 	  Location loc = Location.create(requestData.latitude, requestData.longitude);
     ArcGisResult arcGisResult = ArcGis.callPointService(loc);
    
-    Double z1p0Val = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
-    Double z2p5Val = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
+    double z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
+    double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
+    
+    /*
+     * TODO This gets the job done for now. Seattle is a special case where
+     * z1p0 is returned as a converted z2p5 value, instead of the model
+     * value itself. 
+     */
+    if (requestData.basinRegion.id.equals("pugetLowland")) {
+      z1p0 = 0.1039 * z2p5 + 0.2029;
+      System.out.println("hello PNW");
+    }
+    
+    BasinResponse z1p0resp = new BasinResponse(requestData.basinModel.z1p0, z1p0);
+	  BasinResponse z2p5resp = new BasinResponse(requestData.basinModel.z2p5, z2p5);
 	  
-    BasinResponse z1p0 = new BasinResponse(requestData.basinModel.z1p0, z1p0Val);
-	  BasinResponse z2p5 = new BasinResponse(requestData.basinModel.z2p5, z2p5Val);
-	  
-	  ResponseData responseData = new ResponseData(z1p0, z2p5);
+	  ResponseData responseData = new ResponseData(z1p0resp, z2p5resp);
 	  
 	  return new Response(requestData, responseData, arcGisResult, requestUrl);
 	}
