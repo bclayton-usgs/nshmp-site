@@ -1,5 +1,6 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -56,7 +57,7 @@ public class ArcGis {
     
     try {
       URL url = new URL(urlStr);
-      InputStreamReader reader = new InputStreamReader(url.openStream());
+      BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
       final ArcGisReturn svcReturn = GSON.fromJson(reader, ArcGisReturn.class);
       reader.close();
       

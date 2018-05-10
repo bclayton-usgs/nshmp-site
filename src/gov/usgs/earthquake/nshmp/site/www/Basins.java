@@ -78,9 +78,7 @@ public class Basins {
         throw new RuntimeException("Could not find: " + BASIN_FILE);
       }
       
-      InputStreamReader reader = new InputStreamReader(url.openStream());
-      FeatureCollection fc = FeatureCollection.read(reader);
-      reader.close();
+      FeatureCollection fc = FeatureCollection.read(url);
     
       ImmutableList.Builder<BasinRegion> basinBuilder = ImmutableList.builder();
     
@@ -156,27 +154,25 @@ public class Basins {
   public static class BasinRegion {
     /** 
      * The title for a {@code BasinRegion}, provided by 
-     *    {@link Properties#getProperty(String)} where 
+     *    {@link Properties#getStringProperty(String)} where 
      *    the argument equals "title".
      */
     public final String title;
     /** 
      * The id for a {@code BasinRegion}, provided by
-     *    {@link Properties#getProperty(String)} where 
+     *    {@link Properties#geStringProperty(String)} where 
      *    the argument equals "id".
      */
     public final String id;
     /** 
-     * The default basin model for a {@code BasinRegion} , provided
-     *    by {@link Properties#getProperty(String)} where 
+     * The default basin model for a {@code BasinRegion}, provided
+     *    by {@link Properties#getStringProperty(String)} where 
      *    the argument equals "defaultModel"
      */
     public final BasinModel defaultModel;
     /** 
-     * The {@link Polygon} {@link Geometry} for the {@code BasinRegion}.
-     * <br>
-     * 
-     * See {@link Basins#getGeometry(Feature)}.
+     * The {@link Region} for the {@code BasinRegion} created 
+     *    with {@link Polygon#toRegion(String)}.
      */
     public final Region region;
     
