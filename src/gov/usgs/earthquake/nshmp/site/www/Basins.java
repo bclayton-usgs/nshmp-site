@@ -84,7 +84,7 @@ public class Basins {
     
       ImmutableList.Builder<BasinRegion> basinBuilder = ImmutableList.builder();
     
-      for (Feature feature : fc.features) {
+      for (Feature feature : fc.getFeatures()) {
         basinBuilder.add(new BasinRegion(feature));
       }
     
@@ -125,16 +125,11 @@ public class Basins {
    *    location or {@code null}.
    */
   public BasinRegion findRegion(Location loc) {
-    
-    for (BasinRegion basin : this.basinRegions) {
-      Region region = Regions.create(
-          "basin", 
-          basin.geometry.toLocationList(), 
-          BorderType.MERCATOR_LINEAR);
-      Boolean isContained = region.contains(loc);
-      if (isContained) return basin;
+    for (BasinRegion basin : basinRegions) {
+      if (basin.region.contains(loc)) {
+        return basin;
+      }
     }
-    
     return null;
   }
  
@@ -183,7 +178,7 @@ public class Basins {
      * 
      * See {@link Basins#getGeometry(Feature)}.
      */
-    public final Polygon geometry;
+    public final Region region;
     
     /**
      * Create a new {@code BasinRegion}.
@@ -191,16 +186,12 @@ public class Basins {
      * @param feature The {@link Feature}
      */
     private BasinRegion(Feature feature) {
-      Properties properties = Properties.builder()
-          .putAll(feature.properties)
-          .build();
-      
-      String modelId = (String) properties.getProperty("defaultModel");
-
-      this.geometry = getGeometry(feature); 
+      Properties properties = feature.getProperties();
+      this.title = properties.getStringProperty("title");
+      this.id = properties.getStringProperty("id");
+      String modelId = properties.getStringProperty("defaultModel");
       this.defaultModel = BasinModel.fromId(modelId);
-      this.title = (String) properties.getProperty("title");
-      this.id = (String) properties.getProperty("id");
+      this.region = feature.getGeometry().asPolygon().toRegion(title);
     }
     
     /**
@@ -212,23 +203,6 @@ public class Basins {
       return Util.GSON.toJson(this);
     }
     
-  }
-
-  /**
-   * Return the {@link Polygon} GeoJson {@link Geometry} corresponding
-   *    to its {@link Feature}.
-   *    
-   * @param feature The {@code Feature}.
-   * @return The {@code Polygon}
-   */
-  private static Polygon getGeometry(Feature feature) {
-    GeoJsonType type = GeoJsonType.getEnum(feature.geometry.getType());
-    
-    if (type.equals(GeoJsonType.POLYGON)) {
-      return (Polygon) feature.geometry;
-    }
-    
-    throw new IllegalStateException("Could not find a polygon geometry");
   }
 
 }
