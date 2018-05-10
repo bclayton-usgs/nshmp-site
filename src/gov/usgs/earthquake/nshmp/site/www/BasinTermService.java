@@ -171,15 +171,15 @@ public class BasinTermService extends HttpServlet {
 	  Location loc = Location.create(requestData.latitude, requestData.longitude);
     ArcGisResult arcGisResult = ArcGis.callPointService(loc);
    
-    double z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
-    double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
+    Double z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
+    Double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
     
     /*
      * TODO This gets the job done for now. Seattle is a special case where
      * z1p0 is returned as a converted z2p5 value, instead of the model
      * value itself. 
      */
-    if (requestData.basinRegion.id.equals("pugetLowland")) {
+    if (requestData.basinRegion.id.equals("pugetLowland") && z2p5 != null) {
       z1p0 = 0.1039 * z2p5 + 0.2029;
     }
     
@@ -263,17 +263,34 @@ public class BasinTermService extends HttpServlet {
 	  final double latitude;
 	  final double longitude;
 	  final BasinModel basinModel;
-	  final BasinRegion basinRegion;
+	  final BasinRegionRequest basinRegion;
 	  
 	  RequestData(
 	      BasinRegion basinRegion, 
 	      BasinModel basinModel, 
 	      double latitude, 
 	      double longitude) {
-	    this.basinRegion = basinRegion;
+	    this.basinRegion = BasinRegionRequest.getBasinRegionRequest(basinRegion); 
 	    this.basinModel = basinModel;
 	    this.latitude = latitude;
 	    this.longitude = longitude;
+	  }
+	}
+
+	/**
+	 * Container class to hold information about the {@link BasinRegion}.
+	 */
+	private static class BasinRegionRequest {
+	  final String title;
+	  final String id;
+	  
+	  BasinRegionRequest(BasinRegion basinRegion) {
+	    this.title = basinRegion.title;
+	    this.id = basinRegion.id;
+	  }
+	  
+	  private static BasinRegionRequest getBasinRegionRequest(BasinRegion basinRegion) {
+	    return basinRegion == null ? null : new BasinRegionRequest(basinRegion);
 	  }
 	}
 	
@@ -341,7 +358,7 @@ public class BasinTermService extends HttpServlet {
 	  final String url;
 	  final RequestData request;
 	  final ResponseData response;
-	  final ArcGisResult arcGisResponse;
+	  transient final ArcGisResult arcGisResponse;
 	  
 	  Response(
 	      RequestData requestData, 
