@@ -20,7 +20,7 @@ import gov.usgs.earthquake.nshmp.site.www.Util.EnumParameter;
 import gov.usgs.earthquake.nshmp.site.www.Util.Key;
 import gov.usgs.earthquake.nshmp.site.www.Util.Status;
 
-import static gov.usgs.earthquake.nshmp.json.Util.cleanPoly;
+import static gov.usgs.earthquake.nshmp.json.JsonUtil.cleanPoly;
 import static gov.usgs.earthquake.nshmp.site.www.Util.GSON;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
