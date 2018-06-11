@@ -20,7 +20,6 @@ import gov.usgs.earthquake.nshmp.site.www.Util.EnumParameter;
 import gov.usgs.earthquake.nshmp.site.www.Util.Key;
 import gov.usgs.earthquake.nshmp.site.www.Util.Status;
 
-import static gov.usgs.earthquake.nshmp.json.JsonUtil.cleanPoly;
 import static gov.usgs.earthquake.nshmp.site.www.Util.GSON;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -128,14 +127,14 @@ public class BasinTermService extends HttpServlet {
       }
       
       if (isNullOrEmpty(query)) {
-        writer.printf(cleanPoly(GSON.toJson(new Metadata())), 
+        writer.printf(GSON.toJson(new Metadata()), 
             protocol, host, protocol, host, protocol, host);
         return;
       }
       
       Map<String, String[]> paramMap = request.getParameterMap();
       Response svcResponse = processBasinTerm(paramMap, requestUrl);
-      String json = cleanPoly(GSON.toJson(svcResponse));
+      String json = GSON.toJson(svcResponse);
       writer.println(json);
     } catch(Exception e) {
       writer.println(Util.errorMessage(requestUrl, e));
