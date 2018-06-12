@@ -97,7 +97,8 @@ public class BasinTermService extends HttpServlet {
 	    HttpServletRequest request, 
 	    HttpServletResponse response) 
 	        throws ServletException, IOException {
-		
+	
+	  Util.setCorsHeadersAndContentType(response);
 	  PrintWriter writer = response.getWriter();
 	  
 	  String query = request.getQueryString();

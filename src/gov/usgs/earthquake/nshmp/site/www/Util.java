@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -47,6 +49,13 @@ public class Util {
         .serializeNulls()
         .setPrettyPrinting()
         .create();
+  }
+  
+  static void setCorsHeadersAndContentType(HttpServletResponse response) {
+    response.setContentType("application/json; charset=UTF-8");
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "*");
+    response.setHeader("Access-Control-Allow-Headers", "accept,origin,authorization,content-type");
   }
 
   /**
