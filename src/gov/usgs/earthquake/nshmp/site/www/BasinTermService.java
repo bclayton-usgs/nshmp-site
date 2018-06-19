@@ -295,7 +295,8 @@ public class BasinTermService extends HttpServlet {
 	}
 	
 	/**
-	 * Container class to hold information for each basin term, z1p0 and z2p5. 
+	 * Container class to hold information for each basin term, z1p0 and z2p5.
+	 * This scales values down to km units required by GMMs.
 	 */
 	private static class BasinResponse {
 	  final String model;
@@ -303,7 +304,7 @@ public class BasinTermService extends HttpServlet {
 	 
 	  BasinResponse(String model, Double value) {
 	    this.model = model;
-	    this.value = value;
+	    this.value = (value == null) ? null : value / 1000.0;
 	  }
 	}
 	
