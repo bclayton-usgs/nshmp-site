@@ -175,12 +175,14 @@ public class BasinTermService extends HttpServlet {
     Double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
     
     /*
-     * TODO This gets the job done for now. Seattle is a special case where
-     * z1p0 is returned as a converted z2p5 value, instead of the model
-     * value itself. 
+     * Seattle is a special case where z1p0 is returned as a converted z2p5
+     * value, instead of the model value itself. Two regressions derived by M.
+     * Moschetti in memo dated July 6, 2018, each with 50% weight.
      */
     if (requestData.basinRegion.id.equals("pugetLowland") && z2p5 != null) {
-      z1p0 = 0.1039 * z2p5 + 0.2029;
+      z1p0 = 
+          0.5 * (0.1146 * z2p5 + 0.2826) +
+          0.5 * (0.0933 * z2p5 + 0.1444);
     }
     
     BasinResponse z1p0resp = new BasinResponse(requestData.basinModel.z1p0, z1p0);
