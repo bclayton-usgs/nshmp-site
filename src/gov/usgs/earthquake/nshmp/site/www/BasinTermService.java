@@ -171,8 +171,8 @@ public class BasinTermService extends HttpServlet {
 	  Location loc = Location.create(requestData.latitude, requestData.longitude);
     ArcGisResult arcGisResult = ArcGis.callPointService(loc);
    
-    Double z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0);
-    Double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5);
+    Double z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0) / 1000.0;
+    Double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5) / 1000.0;
     
     /*
      * Seattle is a special case where z1p0 is returned as a converted z2p5
@@ -306,7 +306,7 @@ public class BasinTermService extends HttpServlet {
 	 
 	  BasinResponse(String model, Double value) {
 	    this.model = model;
-	    this.value = (value == null) ? null : value / 1000.0;
+	    this.value = value;
 	  }
 	}
 	
