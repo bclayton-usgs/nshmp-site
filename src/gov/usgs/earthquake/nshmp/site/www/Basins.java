@@ -10,12 +10,12 @@ import gov.usgs.earthquake.nshmp.geo.BorderType;
 import gov.usgs.earthquake.nshmp.geo.Location;
 import gov.usgs.earthquake.nshmp.geo.Region;
 import gov.usgs.earthquake.nshmp.geo.Regions;
-import gov.usgs.earthquake.nshmp.json.Feature;
-import gov.usgs.earthquake.nshmp.json.FeatureCollection;
-import gov.usgs.earthquake.nshmp.json.GeoJsonType;
-import gov.usgs.earthquake.nshmp.json.Geometry;
-import gov.usgs.earthquake.nshmp.json.Polygon;
-import gov.usgs.earthquake.nshmp.json.Properties;
+import gov.usgs.earthquake.nshmp.geo.json.Feature;
+import gov.usgs.earthquake.nshmp.geo.json.FeatureCollection;
+import gov.usgs.earthquake.nshmp.geo.json.GeoJsonType;
+import gov.usgs.earthquake.nshmp.geo.json.Geometry;
+import gov.usgs.earthquake.nshmp.geo.json.Polygon;
+import gov.usgs.earthquake.nshmp.geo.json.Properties;
 
 /**
  * Class to read in the GeoJson feature collection file of basins, basins.geojson.
