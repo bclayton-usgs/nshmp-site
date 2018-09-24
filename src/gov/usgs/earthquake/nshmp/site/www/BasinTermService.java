@@ -138,6 +138,7 @@ public class BasinTermService extends HttpServlet {
       String json = GSON.toJson(svcResponse);
       writer.println(json);
     } catch(Exception e) {
+      e.printStackTrace();
       writer.println(Util.errorMessage(requestUrl, e));
     }
 	}
@@ -170,21 +171,32 @@ public class BasinTermService extends HttpServlet {
 	 
 	  Location loc = Location.create(requestData.latitude, requestData.longitude);
     ArcGisResult arcGisResult = ArcGis.callPointService(loc);
-   
-    Double z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0) / 1000.0;
+    
     Double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5) / 1000.0;
+    Double z1p0;
     
     /*
      * Seattle is a special case where z1p0 is returned as a converted z2p5
      * value, instead of the model value itself. Two regressions derived by M.
      * Moschetti in memo dated July 6, 2018, each with 50% weight.
+     * 
+     * TODO (revisit) There is also a problem right now in that the Seattle z1p0
+     * and z2p5 datasets do not have identical spatial representation in the 
+     * Arc geodatabase. The basin polygon was created based on the z2p5 dataset,
+     * but there are locations (e.g. -122.7 46.9) where the z1p0 value will be null.
+     * The site being in the Seattle polygon expects both values to be valid but 
+     * throws an  error when they are not. For the time being we bypass this error 
+     * by handling processing the z2p5, regardless of basin, and only then process
+     * z1p0.
      */
     if (requestData.basinRegion.id.equals("pugetLowland") && z2p5 != null) {
       z1p0 = 
           0.5 * (0.1146 * z2p5 + 0.2826) +
           0.5 * (0.0933 * z2p5 + 0.1444);
+    } else {
+      z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0) / 1000.0;
     }
-    
+
     BasinResponse z1p0resp = new BasinResponse(requestData.basinModel.z1p0, z1p0);
 	  BasinResponse z2p5resp = new BasinResponse(requestData.basinModel.z2p5, z2p5);
 	  
@@ -410,7 +422,7 @@ public class BasinTermService extends HttpServlet {
 	        EnumSet.allOf(BasinModel.class));
 
       this.basinRegions = basins.basinRegions;
-	  }
-	}
+    }
+  }
 
 }
