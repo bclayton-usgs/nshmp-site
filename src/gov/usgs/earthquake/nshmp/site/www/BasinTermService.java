@@ -123,7 +123,7 @@ public class BasinTermService extends HttpServlet {
     try {
       if (!isNullOrEmpty(pathInfo) && pathInfo.equals("/geojson")) {
         Basins basins = Basins.getBasins();
-        writer.println(basins.featureCollection.toJsonString());
+        writer.println(basins.json);
         return;
       }
       
