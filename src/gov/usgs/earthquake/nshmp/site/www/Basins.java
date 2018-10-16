@@ -1,10 +1,12 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
+import java.awt.Polygon;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.Resources;
 
 import gov.usgs.earthquake.nshmp.geo.BorderType;
 import gov.usgs.earthquake.nshmp.geo.Location;
@@ -12,9 +14,7 @@ import gov.usgs.earthquake.nshmp.geo.Region;
 import gov.usgs.earthquake.nshmp.geo.Regions;
 import gov.usgs.earthquake.nshmp.geo.json.Feature;
 import gov.usgs.earthquake.nshmp.geo.json.FeatureCollection;
-import gov.usgs.earthquake.nshmp.geo.json.GeoJsonType;
-import gov.usgs.earthquake.nshmp.geo.json.Geometry;
-import gov.usgs.earthquake.nshmp.geo.json.Polygon;
+import gov.usgs.earthquake.nshmp.geo.json.GeoJson;
 import gov.usgs.earthquake.nshmp.geo.json.Properties;
 
 /**
@@ -47,6 +47,8 @@ public class Basins {
   public ImmutableList<BasinRegion> basinRegions;
   /** The {@link FeatureCollection} read in */
   public FeatureCollection featureCollection;
+  
+  public final String json;
 
   /** File to read in */
   private static final String BASIN_FILE = "basins.geojson";
@@ -58,9 +60,10 @@ public class Basins {
    * @param basins The {@code List} of {@link BasinRegion}s.
    * @param fc The {@link FeatureCollection}.
    */
-  private Basins(ImmutableList<BasinRegion> basins, FeatureCollection fc) {
+  private Basins(ImmutableList<BasinRegion> basins, FeatureCollection fc, String json) {
     this.basinRegions = basins;
     this.featureCollection = fc;
+    this.json = json;
   }
  
   /**
@@ -74,21 +77,26 @@ public class Basins {
   public static Basins getBasins() {
     try {
       URL url = Basins.class.getResource(BASIN_FILE);
-      if (url == null) {
-        throw new RuntimeException("Could not find: " + BASIN_FILE);
-      }
+      String json = Resources.toString(url, StandardCharsets.UTF_8);
+//      if (url == null) {
+//        throw new RuntimeException("Could not find: " + BASIN_FILE);
+//      }
       
-      FeatureCollection fc = FeatureCollection.read(url);
+      FeatureCollection fc = GeoJson.fromJson(url);
     
       ImmutableList.Builder<BasinRegion> basinBuilder = ImmutableList.builder();
     
-      for (Feature feature : fc.getFeatures()) {
+      for (Feature feature : fc.features()) {
         basinBuilder.add(new BasinRegion(feature));
       }
     
-      return new Basins(basinBuilder.build(), fc);
-    } catch (IOException | NullPointerException e) {
-      throw new RuntimeException("Could not read in " + BASIN_FILE);
+      
+      return new Basins(basinBuilder.build(), fc, json);
+//    } catch (IOException | NullPointerException e) {
+      
+    } catch (IOException ioe) {
+      // TODO propagate IOE from method
+      throw new RuntimeException(ioe);
     }
   }
 
@@ -182,12 +190,15 @@ public class Basins {
      * @param feature The {@link Feature}
      */
     private BasinRegion(Feature feature) {
-      Properties properties = feature.getProperties();
-      this.title = properties.getStringProperty("title");
-      this.id = properties.getStringProperty("id");
-      String modelId = properties.getStringProperty("defaultModel");
+      Properties properties = feature.properties();
+      this.title = properties.getString("title");
+      this.id = properties.getString("id");
+      String modelId = properties.getString("defaultModel");
       this.defaultModel = BasinModel.fromId(modelId);
-      this.region = feature.getGeometry().asPolygon().toRegion(title);
+      this.region = Regions.create(
+          title, 
+          feature.asPolygonBorder(), 
+          BorderType.MERCATOR_LINEAR);
     }
     
     /**
