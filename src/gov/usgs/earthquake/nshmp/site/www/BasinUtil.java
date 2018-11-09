@@ -82,7 +82,7 @@ class BasinUtil {
   
   /* A {@code JsonSerializer} for {@code BasinModels} */
   private static final class BasinModelSerializer 
-      implements JsonSerializer<BasinModel>, JsonDeserializer<BasinModel> {
+      implements JsonSerializer<BasinModel> {
     
     @Override
     public JsonElement serialize(
@@ -97,13 +97,6 @@ class BasinUtil {
       json.addProperty(Key.Z2P5.toString(), basinModel.z2p5);
   
       return json;
-    }
-    
-    @Override
-    public BasinModel deserialize(JsonElement json, Type typeOfT,
-        JsonDeserializationContext context) throws JsonParseException {
-    
-      return BasinModel.fromId(json.getAsJsonObject().get("id").getAsString());
     }
   }
 
