@@ -1,0 +1,29 @@
+{
+  "status": "success",
+  "name": "Basin Term Service",
+  "date": "Tue Nov 13 14:24:08 MST 2018",
+  "url": "http://localhost:8080/nshmp-site-ws/basin?latitude=34.05&longitude=-118.25",
+  "request": {
+    "latitude": 34.04,
+    "longitude": -118.24,
+    "basinModel": {
+      "id": "cvms426m01",
+      "z1p0": "z1p0cvms426m01",
+      "z2p5": "z2p5cvms426m01"
+    },
+    "basinRegion": {
+      "title": "Los Angeles Basin",
+      "id": "losAngelesBasin"
+    }
+  },
+  "response": {
+    "z1p0": {
+      "model": "z1p0cvms426m01",
+      "value": 0.305
+    },
+    "z2p5": {
+      "model": "z2p5cvms426m01",
+      "value": 2.17
+    }
+  }
+}
