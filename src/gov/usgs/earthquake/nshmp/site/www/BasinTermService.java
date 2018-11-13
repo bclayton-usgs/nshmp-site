@@ -223,7 +223,7 @@ public class BasinTermService extends NshmpServlet {
     }
   }
 
-  private static class Response {
+  static class Response {
     final String status;
     final String name;
     final String date;
