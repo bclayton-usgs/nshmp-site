@@ -1,3 +1,14 @@
+/*
+ * Eclipse Notes: Currently the basin service cannot be deployed through
+ * Eclipse and must be deployed to Tomcat manually. 
+ * 
+ * The war file can be copied to Tomcat using the 'tomcat' Gradle task. 
+ * For the Gradle task to work one must add the following to the Gradle 
+ * properties file at ~/.gradle/gradle.properties:
+ *
+ * tomcat_loc=path/to/tomcat/webapps
+ */
+
 apply plugin: 'eclipse-wtp'
 apply plugin: 'java'
 apply plugin: 'war'
@@ -22,10 +33,18 @@ repositories {
 }
 
 dependencies {
-  providedCompile 'org.apache.tomcat:tomcat-catalina:8.0.45'
-  compile project(':nshmp-haz')
+  compile project(':nshmp-haz-ws')
 }
 
 war {
   webAppDirName = 'webapp'
+}
+
+task tomcat(type: Copy, dependsOn: assemble) {
+  def tomcatLoc = findProperty("tomcat_loc")
+
+  if (tomcatLoc) {
+    from file("${buildDir}/libs/nshmp-site-ws.war")
+    into file(tomcatLoc)
+  }
 }
