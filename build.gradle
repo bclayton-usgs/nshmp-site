@@ -52,7 +52,7 @@ war {
   webAppDirName = 'webapp'
 }
 
-task deploy(type: Copy, dependsOn: assemble) {
+task deploy(type: Copy, dependsOn: build) {
   def webappDir = findProperty("webapps_loc")
 
   if (webappDir) {
