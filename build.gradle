@@ -1,12 +1,15 @@
 /*
  * Eclipse Notes: Currently the basin service cannot be deployed through
- * Eclipse and must be deployed to Tomcat manually. 
+ * Eclipse and must be deployed manually. Eclipse Buildship does not
+ * reference Gradle tasks for deployment and relies instead on the project 
+ * 'Deployment Assembly', which does not correclty compile dependent
+ * projects. 
  * 
- * The war file can be copied to Tomcat using the 'tomcat' Gradle task. 
- * For the Gradle task to work one must add the following to the Gradle 
- * properties file at ~/.gradle/gradle.properties:
+ * As a workaround, use the additional 'deploy' task to build a WAR and
+ * copy it to the webapps or other deployment directory specified in your 
+ * ~/.gradle/gradle.properties file:
  *
- * tomcat_loc=path/to/tomcat/webapps
+ * webapps_loc=path/to/servlet/webapps
  */
 
 apply plugin: 'eclipse-wtp'
@@ -49,16 +52,16 @@ war {
   webAppDirName = 'webapp'
 }
 
-task tomcat(type: Copy, dependsOn: assemble) {
-  def tomcatLoc = findProperty("tomcat_loc")
+task deploy(type: Copy, dependsOn: assemble) {
+  def webappDir = findProperty("webapps_loc")
 
-  if (tomcatLoc) {
+  if (webappDir) {
     from file("${buildDir}/libs/nshmp-site-ws.war")
-    into file(tomcatLoc)
+    into file(webappDir)
   }
 }
 
-configure(tomcat) {   
+configure(deploy) {   
   group = 'Build'
   description = 'Publish WAR to webapps'
 }
