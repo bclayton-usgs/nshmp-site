@@ -1,6 +1,7 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
 import static org.junit.Assert.assertEquals;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.*;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -46,24 +47,24 @@ public class BasinServiceTest {
 
   private static final List<NshmpSite> LOCATIONS = ImmutableList.of(
       /* LA Basin */
-      NshmpSite.LOS_ANGELES_CA,
-      NshmpSite.NORTHRIDGE_CA,
+      LOS_ANGELES_CA,
+      NORTHRIDGE_CA,
 
       /* Bay Area */
-      NshmpSite.SAN_FRANCISCO_CA,
-      NshmpSite.SAN_JOSE_CA,
-      NshmpSite.OAKLAND_CA,
+      SAN_FRANCISCO_CA,
+      SAN_JOSE_CA,
+      OAKLAND_CA,
 
       /* Wasatch Front */
-      NshmpSite.SALT_LAKE_CITY_UT,
-      NshmpSite.PROVO_UT,
+      SALT_LAKE_CITY_UT,
+      PROVO_UT,
 
       /* Puget Lowland */
-      NshmpSite.SEATTLE_WA,
-      NshmpSite.TACOMA_WA,
+      SEATTLE_WA,
+      TACOMA_WA,
 
       /* Outside basin */
-      NshmpSite.ELKO_NV);
+      ELKO_NV);
 
   static {
     Properties prop = new Properties();
