@@ -66,6 +66,7 @@ public class ArcGis {
   /**
    * Container class for a single result from the ArcGis web service.
    */
+  @SuppressWarnings("javadoc")
   public static class ArcGisResult {
     public String arcUrl;
     public final double latitude;

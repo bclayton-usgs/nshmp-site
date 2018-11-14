@@ -31,6 +31,7 @@ import gov.usgs.earthquake.nshmp.site.www.BasinTermService.Response;
  * 
  * @author Brandon Clayton
  */
+@SuppressWarnings("javadoc")
 public class BasinServiceTest {
 
   private static final Path DATA_PATH = Paths.get("test/gov/usgs/earthquake/nshmp/site/data");
