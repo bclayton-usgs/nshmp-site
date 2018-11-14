@@ -1,19 +1,24 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.ELKO_NV;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.LOS_ANGELES_CA;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.NORTHRIDGE_CA;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.OAKLAND_CA;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.PROVO_UT;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.SALT_LAKE_CITY_UT;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.SAN_FRANCISCO_CA;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.SAN_JOSE_CA;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.SEATTLE_WA;
+import static gov.usgs.earthquake.nshmp.internal.NshmpSite.TACOMA_WA;
 import static org.junit.Assert.assertEquals;
-import static gov.usgs.earthquake.nshmp.internal.NshmpSite.*;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Properties;
 
 import org.junit.Test;
 
@@ -37,13 +42,7 @@ public class BasinServiceTest {
 
   private static final Path DATA_PATH = Paths.get("test/gov/usgs/earthquake/nshmp/site/data");
 
-  private static final String CONFIG_FILE = "config.properties";
-
-  private static final String SERVICE_PATH = "/nshmp-site-ws/basin";
-
   private static final String RESULT_SUFFIX = "-result.json";
-
-  private static String SERVICE_URL;
 
   private static final List<NshmpSite> LOCATIONS = ImmutableList.of(
       /* LA Basin */
@@ -65,20 +64,6 @@ public class BasinServiceTest {
 
       /* Outside basin */
       ELKO_NV);
-
-  static {
-    Properties prop = new Properties();
-    InputStream input = null;
-
-    try {
-      input = new FileInputStream(CONFIG_FILE);
-      prop.load(input);
-
-      SERVICE_URL = prop.getProperty("service_host") + SERVICE_PATH;
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
   @Test
   public void testService() throws Exception {
@@ -103,8 +88,11 @@ public class BasinServiceTest {
   private static Response generateActual(NshmpSite site) throws Exception {
     Location loc = site.location();
 
-    String serviceQuery = SERVICE_URL + "?latitude=" + loc.lat() + "&longitude=" + loc.lon();
+    String serviceQuery = BasinUtil.SERVICE_URL +
+        "?latitude=" + loc.lat() +
+        "&longitude=" + loc.lon();
     URL url = new URL(serviceQuery);
+    System.out.println(url);
     BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
     Response svcResponse = BasinUtil.GSON.fromJson(reader, Response.class);
     reader.close();
