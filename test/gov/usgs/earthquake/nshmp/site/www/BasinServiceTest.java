@@ -92,7 +92,6 @@ public class BasinServiceTest {
         "?latitude=" + loc.lat() +
         "&longitude=" + loc.lon();
     URL url = new URL(serviceQuery);
-    System.out.println(url);
     BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
     Response svcResponse = BasinUtil.GSON.fromJson(reader, Response.class);
     reader.close();
