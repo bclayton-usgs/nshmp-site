@@ -21,9 +21,16 @@ sourceSets {
     java {
       srcDirs = ['src']
     }
+
     resources {
       srcDirs = ['src']
       exclude '**/*.java'
+    }
+  }
+
+  test {
+    java {
+      srcDirs = ['test']
     }
   }
 }

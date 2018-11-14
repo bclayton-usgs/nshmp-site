@@ -1,0 +1,29 @@
+{
+  "status": "success",
+  "name": "Basin Term Service",
+  "date": "Tue Nov 13 14:24:09 MST 2018",
+  "url": "http://localhost:8080/nshmp-site-ws/basin?latitude=40.75&longitude=-111.9",
+  "request": {
+    "latitude": 40.76,
+    "longitude": -111.9,
+    "basinModel": {
+      "id": "Wasatch",
+      "z1p0": "z1p0Wasatch",
+      "z2p5": "z2p5Wasatch"
+    },
+    "basinRegion": {
+      "title": "Wasatch Front",
+      "id": "wasatchFront"
+    }
+  },
+  "response": {
+    "z1p0": {
+      "model": "z1p0Wasatch",
+      "value": 0.310078491
+    },
+    "z2p5": {
+      "model": "z2p5Wasatch",
+      "value": 2.708697998
+    }
+  }
+}

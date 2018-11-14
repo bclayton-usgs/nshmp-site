@@ -1,0 +1,22 @@
+{
+  "status": "success",
+  "name": "Basin Term Service",
+  "date": "Tue Nov 13 14:24:09 MST 2018",
+  "url": "http://localhost:8080/nshmp-site-ws/basin?latitude=40.85&longitude=-115.75",
+  "request": {
+    "latitude": 40.86,
+    "longitude": -115.74,
+    "basinModel": null,
+    "basinRegion": null
+  },
+  "response": {
+    "z1p0": {
+      "model": "",
+      "value": null
+    },
+    "z2p5": {
+      "model": "",
+      "value": null
+    }
+  }
+}
