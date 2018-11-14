@@ -28,7 +28,7 @@ import gov.usgs.earthquake.nshmp.site.www.basin.BasinModel;
 class BasinUtil {
 
   static final Gson GSON;
-  static String ARCGIS_URL;
+  static String ARCGIS_HOST;
   static String SERVICE_URL;
 
   static {
@@ -45,7 +45,7 @@ class BasinUtil {
       InputStream config = new FileInputStream("config.properties");
       props.load(config);
       SERVICE_URL = props.getProperty("service_host") + "/nshmp-site-ws/basin";
-      ARCGIS_URL = props.getProperty("arcgis_host");
+      ARCGIS_HOST = props.getProperty("arcgis_host");
     } catch (IOException e) {
       e.printStackTrace();
     }
