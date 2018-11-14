@@ -33,7 +33,10 @@ import gov.usgs.earthquake.nshmp.www.meta.ParamType;
 import gov.usgs.earthquake.nshmp.www.meta.Status;;
 
 /**
- * Basin term service, internally calls an ArcGIS online service.
+ * Basin term service, internally calls an ArcGIS online service. The ArcGis
+ * host server needs to be identified in a config.properties file at the
+ * root of the source directory, for example:
+ * {@code arcgis_host=https://some.agol.server}
  * 
  * <p> Note: If the latitude and longitude supplied in the query is not
  * contained in a basin region the resulting z1p0 and z2p5 values are set to
