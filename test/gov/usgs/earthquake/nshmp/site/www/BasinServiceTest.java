@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 

@@ -41,6 +41,7 @@ repositories {
 
 dependencies {
   compile project(':nshmp-haz-ws')
+  testCompile 'junit:junit:4.12'
 }
 
 war {
