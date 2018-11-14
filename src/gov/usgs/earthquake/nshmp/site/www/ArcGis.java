@@ -13,21 +13,19 @@ import gov.usgs.earthquake.nshmp.util.Maths;
 import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
 
 /**
- * Wrapper around the <a
- * href="https://dev-earthquake.cr.usgs.gov/arcgis/rest/services/haz/basin/MapServer/identify">
- * ArcGis online service. </a>
+ * Wrapper around the supporting ArcGIS online basin data service.
  * 
  * <p> ArcGis point geometry wrapper service call:
  * {@link ArcGis#callPointService(Location)}
  * 
- * <p> Note: The latitude and longitude is rounded to the nearest {@code 0.02}
+ * <p> Note: Latitude and longitude are rounded to the nearest {@code 0.02}
  * 
  * @author Brandon Clayton
  */
 class ArcGis {
   
-  private static final String SERVICE_URL = "https://dev01-gis01.cr.usgs.gov/" +
-      "arcgis/rest/services/haz/basin/MapServer/identify?";
+  private static final String QUERY_BASE = "/arcgis/rest/services/haz/basin/MapServer/identify?";
+  private static final String SERVICE_URL = BasinUtil.ARCGIS_URL + QUERY_BASE;
 
   static final double ROUND_MODEL = 0.02;
 
