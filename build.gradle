@@ -57,3 +57,8 @@ task tomcat(type: Copy, dependsOn: assemble) {
     into file(tomcatLoc)
   }
 }
+
+configure(tomcat) {   
+  group = 'Build'
+  description = 'Publish WAR to webapps'
+}
