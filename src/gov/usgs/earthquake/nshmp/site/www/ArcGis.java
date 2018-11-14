@@ -24,7 +24,8 @@ import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
  * 
  * @author Brandon Clayton
  */
-public class ArcGis {
+class ArcGis {
+  
   private static final String SERVICE_URL = "https://dev01-gis01.cr.usgs.gov/" +
       "arcgis/rest/services/haz/basin/MapServer/identify?";
 
@@ -37,7 +38,7 @@ public class ArcGis {
    * @param latitude in degrees
    * @param longitude in degrees
    */
-  public static ArcGisResult callPointService(double latitude, double longitude) {
+  static ArcGisResult callPointService(double latitude, double longitude) {
     latitude = Maths.round(latitude, ROUND_MODEL);
     longitude = Maths.round(longitude, ROUND_MODEL);
 
@@ -66,8 +67,7 @@ public class ArcGis {
   /**
    * Container class for a single result from the ArcGis web service.
    */
-  @SuppressWarnings("javadoc")
-  public static class ArcGisResult {
+  static class ArcGisResult {
     public String arcUrl;
     public final double latitude;
     public final double longitude;
@@ -91,7 +91,7 @@ public class ArcGis {
   }
 
   /* Container class to hold the JSON results from the ArcGis web service. */
-  private static class ArcGisReturn {
+  static class ArcGisReturn {
     List<ArcGisResult> results;
   }
 
