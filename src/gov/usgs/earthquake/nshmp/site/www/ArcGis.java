@@ -13,20 +13,19 @@ import gov.usgs.earthquake.nshmp.util.Maths;
 import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
 
 /**
- * Wrapper around the <a
- * href="https://dev-earthquake.cr.usgs.gov/arcgis/rest/services/haz/basin/MapServer/identify">
- * ArcGis online service. </a>
+ * Wrapper around the supporting ArcGIS online basin data service.
  * 
  * <p> ArcGis point geometry wrapper service call:
  * {@link ArcGis#callPointService(Location)}
  * 
- * <p> Note: The latitude and longitude is rounded to the nearest {@code 0.02}
+ * <p> Note: Latitude and longitude are rounded to the nearest {@code 0.02}
  * 
  * @author Brandon Clayton
  */
-public class ArcGis {
-  private static final String SERVICE_URL = "https://dev01-gis01.cr.usgs.gov/" +
-      "arcgis/rest/services/haz/basin/MapServer/identify?";
+class ArcGis {
+  
+  private static final String QUERY_BASE = "/arcgis/rest/services/haz/basin/MapServer/identify?";
+  private static final String SERVICE_URL = BasinUtil.ARCGIS_HOST + QUERY_BASE;
 
   static final double ROUND_MODEL = 0.02;
 
@@ -37,7 +36,7 @@ public class ArcGis {
    * @param latitude in degrees
    * @param longitude in degrees
    */
-  public static ArcGisResult callPointService(double latitude, double longitude) {
+  static ArcGisResult callPointService(double latitude, double longitude) {
     latitude = Maths.round(latitude, ROUND_MODEL);
     longitude = Maths.round(longitude, ROUND_MODEL);
 
@@ -66,7 +65,7 @@ public class ArcGis {
   /**
    * Container class for a single result from the ArcGis web service.
    */
-  public static class ArcGisResult {
+  static class ArcGisResult {
     public String arcUrl;
     public final double latitude;
     public final double longitude;
@@ -90,7 +89,7 @@ public class ArcGis {
   }
 
   /* Container class to hold the JSON results from the ArcGis web service. */
-  private static class ArcGisReturn {
+  static class ArcGisReturn {
     List<ArcGisResult> results;
   }
 

@@ -33,13 +33,17 @@ import gov.usgs.earthquake.nshmp.www.meta.ParamType;
 import gov.usgs.earthquake.nshmp.www.meta.Status;;
 
 /**
- * Basin term service, internally calls the {@link ArcGis} online service.
+ * Basin term service, internally calls an ArcGIS online service. The ArcGis
+ * host server needs to be identified in a config.properties file at the
+ * root of the source directory, for example:
+ * {@code arcgis_host=https://some.agol.server}
  * 
  * <p> Note: If the latitude and longitude supplied in the query is not
  * contained in a basin region the resulting z1p0 and z2p5 values are set to
  * null.
  * 
- * <p> Note: The latitude and longitude is rounded to the nearest {@code 0.02}
+ * <p> Note: Supplied latitude and longitudes are rounded to the nearest
+ * {@code 0.02}
  * 
  * @author Brandon Clayton
  */
@@ -51,8 +55,7 @@ import gov.usgs.earthquake.nshmp.www.meta.Status;;
         "/basin",
         "/basin/*" })
 public class BasinTermService extends NshmpServlet {
-  private static final long serialVersionUID = 1L;
-
+  
   private static final Basins BASINS = Basins.getBasins();
 
   private static final String SERVICE_NAME = "Basin Term Service";
@@ -67,7 +70,7 @@ public class BasinTermService extends NshmpServlet {
       HttpServletRequest request,
       HttpServletResponse response)
       throws ServletException, IOException {
-    
+
     UrlHelper urlHelper = NshmpServlet.urlHelper(request, response);
     String pathInfo = request.getPathInfo();
     String query = request.getQueryString();
@@ -136,7 +139,7 @@ public class BasinTermService extends NshmpServlet {
 
     return new Response(requestData, responseData, arcGisResult, urlHelper);
   }
-  
+
   private static Response processNullResult(
       RequestData requestData,
       UrlHelper urlHelper) {
@@ -151,7 +154,7 @@ public class BasinTermService extends NshmpServlet {
   private static RequestData buildRequest(HttpServletRequest request) {
     double latitude = readDouble(Key.LATITUDE, request);
     double longitude = readDouble(Key.LONGITUDE, request);
-    
+
     latitude = Maths.round(latitude, ArcGis.ROUND_MODEL);
     longitude = Maths.round(longitude, ArcGis.ROUND_MODEL);
 

@@ -4,8 +4,11 @@ import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import com.google.gson.Gson;
@@ -24,6 +27,8 @@ import gov.usgs.earthquake.nshmp.site.www.basin.BasinModel;
 class BasinUtil {
 
   static final Gson GSON;
+  static String ARCGIS_HOST;
+  static String SERVICE_URL;
 
   static {
     GSON = new GsonBuilder()
@@ -33,6 +38,16 @@ class BasinUtil {
         .serializeNulls()
         .setPrettyPrinting()
         .create();
+
+    try {
+      Properties props = new Properties();
+      InputStream config = BasinUtil.class.getResourceAsStream("/config.properties");
+      props.load(config);
+      SERVICE_URL = props.getProperty("service_host") + "/nshmp-site-ws/basin";
+      ARCGIS_HOST = props.getProperty("arcgis_host");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /*
