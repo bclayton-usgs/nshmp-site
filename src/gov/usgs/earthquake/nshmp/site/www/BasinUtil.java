@@ -4,7 +4,6 @@ import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -43,7 +41,7 @@ class BasinUtil {
 
     try {
       Properties props = new Properties();
-      InputStream config = BasinUtil.class.getResourceAsStream("config.properties");
+      InputStream config = BasinUtil.class.getResourceAsStream("/config.properties");
       props.load(config);
       SERVICE_URL = props.getProperty("service_host") + "/nshmp-site-ws/basin";
       ARCGIS_HOST = props.getProperty("arcgis_host");
