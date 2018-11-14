@@ -25,7 +25,7 @@ import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
 class ArcGis {
   
   private static final String QUERY_BASE = "/arcgis/rest/services/haz/basin/MapServer/identify?";
-  private static final String SERVICE_URL = BasinUtil.ARCGIS_URL + QUERY_BASE;
+  private static final String SERVICE_URL = BasinUtil.ARCGIS_HOST + QUERY_BASE;
 
   static final double ROUND_MODEL = 0.02;
 
