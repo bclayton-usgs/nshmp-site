@@ -69,16 +69,13 @@ class ArcGis {
     public String arcUrl;
     public final double latitude;
     public final double longitude;
-    public final double vs30;
     public final Map<String, Double> basinModels;
 
     ArcGisResult(
         Map<String, Double> basinModels,
-        double vs30,
         double latitude,
         double longitude) {
       this.basinModels = basinModels;
-      this.vs30 = vs30;
       this.latitude = latitude;
       this.longitude = longitude;
     }

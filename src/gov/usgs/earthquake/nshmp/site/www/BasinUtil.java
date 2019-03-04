@@ -59,7 +59,6 @@ class BasinUtil {
     LAT,
     LON,
     NULL,
-    VS30,
     Z1P0,
     Z2P5,
 
@@ -149,11 +148,10 @@ class BasinUtil {
         }
       }
 
-      double vs30 = readArcValue(attributesJson, Key.VS30.toUpperCamel());
       double latitude = readArcValue(attributesJson, Key.LAT.toUpperCamel());
       double longitude = readArcValue(attributesJson, Key.LON.toUpperCamel());
 
-      ArcGisResult result = new ArcGisResult(basinModels, vs30, latitude, longitude);
+      ArcGisResult result = new ArcGisResult(basinModels, latitude, longitude);
 
       return result;
     }
