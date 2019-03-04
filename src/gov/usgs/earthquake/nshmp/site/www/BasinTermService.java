@@ -78,7 +78,6 @@ public class BasinTermService extends NshmpServlet {
         final String usage = GSON.toJson(new Metadata());
         urlHelper.writeResponse(usage);
       } else {
-        Map<String, String[]> paramMap = request.getParameterMap();
         Response svcResponse = processBasinTerm(request, urlHelper);
         String json = GSON.toJson(svcResponse);
         urlHelper.writeResponse(json);
