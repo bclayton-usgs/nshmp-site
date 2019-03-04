@@ -7,7 +7,6 @@ import static gov.usgs.earthquake.nshmp.www.Util.readValue;
 import static gov.usgs.earthquake.nshmp.www.meta.Metadata.errorMessage;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -15,11 +14,9 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import gov.usgs.earthquake.nshmp.geo.Location;
 import gov.usgs.earthquake.nshmp.site.www.ArcGis.ArcGisResult;
 import gov.usgs.earthquake.nshmp.site.www.BasinUtil.Key;
 import gov.usgs.earthquake.nshmp.site.www.basin.BasinModel;
@@ -27,15 +24,14 @@ import gov.usgs.earthquake.nshmp.site.www.basin.Basins;
 import gov.usgs.earthquake.nshmp.site.www.basin.Basins.BasinRegion;
 import gov.usgs.earthquake.nshmp.util.Maths;
 import gov.usgs.earthquake.nshmp.www.NshmpServlet;
-import gov.usgs.earthquake.nshmp.www.NshmpServlet.UrlHelper;
 import gov.usgs.earthquake.nshmp.www.meta.EnumParameter;
 import gov.usgs.earthquake.nshmp.www.meta.ParamType;
-import gov.usgs.earthquake.nshmp.www.meta.Status;;
+import gov.usgs.earthquake.nshmp.www.meta.Status;
 
 /**
  * Basin term service, internally calls an ArcGIS online service. The ArcGis
- * host server needs to be identified in a config.properties file at the
- * root of the source directory, for example:
+ * host server needs to be identified in a config.properties file at the root of
+ * the source directory, for example:
  * {@code arcgis_host=https://some.agol.server}
  * 
  * <p> Note: If the latitude and longitude supplied in the query is not
@@ -43,7 +39,7 @@ import gov.usgs.earthquake.nshmp.www.meta.Status;;
  * null.
  * 
  * <p> Note: Supplied latitude and longitudes are rounded to the nearest
- * {@code 0.02}
+ * {@code 0.01}, which is the resolution of the underlying basin depth data.
  * 
  * @author Brandon Clayton
  */
@@ -55,7 +51,7 @@ import gov.usgs.earthquake.nshmp.www.meta.Status;;
         "/basin",
         "/basin/*" })
 public class BasinTermService extends NshmpServlet {
-  
+
   private static final Basins BASINS = Basins.getBasins();
 
   private static final String SERVICE_NAME = "Basin Term Service";

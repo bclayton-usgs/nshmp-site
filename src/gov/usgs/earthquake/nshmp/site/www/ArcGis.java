@@ -18,7 +18,7 @@ import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
  * <p> ArcGis point geometry wrapper service call:
  * {@link ArcGis#callPointService(Location)}
  * 
- * <p> Note: Latitude and longitude are rounded to the nearest {@code 0.02}
+ * <p> Note: Latitude and longitude are rounded to the nearest {@code 0.01}
  * 
  * @author Brandon Clayton
  */
@@ -27,7 +27,7 @@ class ArcGis {
   private static final String QUERY_BASE = "/arcgis/rest/services/haz/basin/MapServer/identify?";
   private static final String SERVICE_URL = BasinUtil.ARCGIS_HOST + QUERY_BASE;
 
-  static final double ROUND_MODEL = 0.02;
+  static final double ROUND_MODEL = 0.01;
 
   /**
    * Return {@code ArcGisResult} from the ArcGis online web service for a point
