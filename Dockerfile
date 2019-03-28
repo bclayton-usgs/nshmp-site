@@ -1,9 +1,18 @@
+###########################
+# Dockerfile for nshmp-site-ws
+###########################
 
+# Builder image working directory
 ARG builder_workdir=/app/nshmp-site-ws
+
+# Path to WAR file in builder image
 ARG war_path=${builder_workdir}/build/libs/nshmp-site-ws.war
 
 ####################
-# Builder Image
+# Builder Image: Java 8
+#   - Install git
+#   - Download nshmp-haz and nshmp-haz-ws
+#   - Build nshmp-site-ws
 ####################
 FROM openjdk:8 as builder
 
@@ -26,7 +35,7 @@ COPY . ${builder_workdir}/.
 RUN apt-get update \
   && apt-get install -y git
 
-# Get nshmp-haz and nshmp-haz-ws and build nshmp-site-ws
+# Download nshmp-haz and nshmp-haz-ws
 RUN git clone ${nshmp_haz} ../nshmp-haz \
   && git clone ${nshmp_haz_ws} ../nshmp-haz-ws
 
@@ -34,7 +43,9 @@ RUN git clone ${nshmp_haz} ../nshmp-haz \
 RUN ./gradlew assemble 
 
 ####################
-# Application Image 
+# Application Image: Tomcat
+#   - Copy WAR file from builder image
+#   - Run Tomcat
 ####################
 FROM tomcat:latest
 
@@ -45,4 +56,4 @@ ARG war_path
 COPY --from=builder ${war_path} ${CATALINA_HOME}/webapps/.
 
 # Run tomcat
-CMD /usr/local/tomcat/bin/catalina.sh run
+CMD ${CATALINA_HOME}/bin/catalina.sh run
