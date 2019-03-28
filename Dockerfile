@@ -14,16 +14,22 @@ ARG war_path=${builder_workdir}/build/libs/nshmp-site-ws.war
 #   - Download nshmp-haz and nshmp-haz-ws
 #   - Build nshmp-site-ws
 ####################
-FROM openjdk:8 as builder
+FROM openjdk:8-alpine as builder
 
 # Get builder workdir
 ARG builder_workdir
 
+# nshmp-haz version
+ARG nshmp_haz_version=master
+
+# nshmp-haz-ws version
+ARG nshmp_haz_ws_version=master
+
 # nshmp-haz repo
-ARG nshmp_haz=https://github.com/usgs/nshmp-haz.git
+ARG nshmp_haz=https://github.com/usgs/nshmp-haz/archive/${nshmp_haz_version}.tar.gz
 
 # nshmp-haz-ws repo
-ARG nshmp_haz_ws=https://github.com/usgs/nshmp-haz-ws.git
+ARG nshmp_haz_ws=https://github.com/usgs/nshmp-haz-ws/archive/${nshmp_haz_ws_version}.tar.gz
 
 # Set working directory
 WORKDIR ${builder_workdir} 
@@ -31,13 +37,14 @@ WORKDIR ${builder_workdir}
 # Copy project over to container
 COPY . ${builder_workdir}/. 
 
-# Update and install git
-RUN apt-get update \
-  && apt-get install -y git
+# Install curl and git
+RUN apk add --no-cache git curl
 
 # Download nshmp-haz and nshmp-haz-ws
-RUN git clone ${nshmp_haz} ../nshmp-haz \
-  && git clone ${nshmp_haz_ws} ../nshmp-haz-ws
+RUN curl -L ${nshmp_haz} | tar -xz \
+  && curl -L ${nshmp_haz_ws} | tar -xz \
+  && mv nshmp-haz-${nshmp_haz_version} ../nshmp-haz \
+  && mv nshmp-haz-ws-${nshmp_haz_ws_version} ../nshmp-haz-ws
 
 # Build nshmp-site-ws
 RUN ./gradlew assemble 
@@ -47,7 +54,7 @@ RUN ./gradlew assemble
 #   - Copy WAR file from builder image
 #   - Run Tomcat
 ####################
-FROM tomcat:latest
+FROM tomcat:8-alpine
 
 # Get WAR path
 ARG war_path
