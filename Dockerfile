@@ -56,6 +56,9 @@ RUN ./gradlew assemble
 ####################
 FROM tomcat:8-alpine
 
+# Set author
+LABEL maintainer="Brandon Clayton <bclayton@usgs.gov>"
+
 # Get WAR path
 ARG war_path
 
@@ -63,4 +66,4 @@ ARG war_path
 COPY --from=builder ${war_path} ${CATALINA_HOME}/webapps/.
 
 # Run tomcat
-CMD ${CATALINA_HOME}/bin/catalina.sh run
+ENTRYPOINT ${CATALINA_HOME}/bin/catalina.sh run
