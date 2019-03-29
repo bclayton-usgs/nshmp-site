@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  webapp:
+  nshmp-site-ws:
     # nshmp-site-ws image
     image: nshmp/nshmp-site-ws:latest
 
