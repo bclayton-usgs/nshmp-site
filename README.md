@@ -18,6 +18,7 @@ The nshmp-site-ws application may be run as a Docker container.
 A public image is available on Docker Hub at
 [https://hub.docker.com/r/nshmp/nshmp-site-ws](https://hub.docker.com/r/nshmp/nshmp-site-ws)
 which can be run with:
+
 ```bash
 docker run -p PORT:8080 -d nshmp/nshmp-site-ws
 
@@ -27,6 +28,7 @@ docker run -p 8080:8080 -d nshmp/nshmp-site-ws
 
 `PORT` should be replaced with an available port that is not in use. The application 
 can then be accessed from:
+
 ```bash
 http://localhost:PORT/nshmp-site-ws/basin
 
@@ -49,6 +51,7 @@ docker build -t nshmp-site-ws:latest .
 #### Customization
 When building the Docker image the version, branch, or commit may be supplied as arguments
 to specify nshmp-haz and nshmp-haz-ws versions.
+
 ```bash
 docker run -p PORT:8080 -d \
   nshmp_haz_version=some-version-or-branch-or-commit \
@@ -61,3 +64,18 @@ docker run -p 8080:8080 -d \
   nshmp_haz_ws_version=v1.1.2 \
   nshmp/nshmp-site-ws
 ```
+
+## Development
+Docker Compose can be used for development:
+
+```bash
+# Run docker-compose.yaml file
+docker-compose up -d
+
+# Look for changes and rebuild WAR file
+./gradlew assemble --continuous
+```
+
+`./gradlew assemble --continuous` looks for any changes in the source
+code and rebuilds the WAR file. Docker Compose looks for any changes to the
+WAR file and redeploys.
