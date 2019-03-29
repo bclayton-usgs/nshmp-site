@@ -8,12 +8,12 @@ ARG builder_workdir=/app/nshmp-site-ws
 # Path to WAR file in builder image
 ARG war_path=${builder_workdir}/build/libs/nshmp-site-ws.war
 
-####################
+####
 # Builder Image: Java 8
 #   - Install git
 #   - Download nshmp-haz and nshmp-haz-ws
 #   - Build nshmp-site-ws
-####################
+####
 FROM openjdk:8-alpine as builder
 
 # Get builder workdir
@@ -49,11 +49,11 @@ RUN curl -L ${nshmp_haz} | tar -xz \
 # Build nshmp-site-ws
 RUN ./gradlew assemble 
 
-####################
+####
 # Application Image: Tomcat
 #   - Copy WAR file from builder image
 #   - Run Tomcat
-####################
+####
 FROM tomcat:8-alpine
 
 # Set author
