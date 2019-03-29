@@ -69,11 +69,11 @@ docker run -p 8080:8080 -d \
 Docker Compose can be used for development:
 
 ```bash
-# Run docker-compose.yaml file
-docker-compose up -d
-
 # Look for changes and rebuild WAR file
 ./gradlew assemble --continuous
+
+# Run docker-compose.yaml file
+docker-compose up -d
 ```
 
 `./gradlew assemble --continuous` looks for any changes in the source
