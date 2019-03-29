@@ -16,20 +16,12 @@ ARG war_path=${builder_workdir}/build/libs/nshmp-site-ws.war
 ####
 FROM openjdk:8-alpine as builder
 
-# Get builder workdir
+# Get builder working directory
 ARG builder_workdir
 
-# nshmp-haz version
-ARG nshmp_haz_version=master
-
-# nshmp-haz-ws version
-ARG nshmp_haz_ws_version=master
-
-# nshmp-haz repo
-ARG nshmp_haz=https://github.com/usgs/nshmp-haz/archive/${nshmp_haz_version}.tar.gz
-
-# nshmp-haz-ws repo
-ARG nshmp_haz_ws=https://github.com/usgs/nshmp-haz-ws/archive/${nshmp_haz_ws_version}.tar.gz
+# Repository versions
+ARG NSHMP_HAZ_VERSION=master
+ARG NSHMP_HAZ_WS_VERSION=master
 
 # Set working directory
 WORKDIR ${builder_workdir} 
@@ -37,17 +29,14 @@ WORKDIR ${builder_workdir}
 # Copy project over to container
 COPY . ${builder_workdir}/. 
 
-# Install curl and git
-RUN apk add --no-cache git curl
+# Install curl, git, and bash
+RUN apk add --no-cache git curl bash
 
-# Download nshmp-haz and nshmp-haz-ws
-RUN curl -L ${nshmp_haz} | tar -xz \
-  && curl -L ${nshmp_haz_ws} | tar -xz \
-  && mv nshmp-haz-${nshmp_haz_version} ../nshmp-haz \
-  && mv nshmp-haz-ws-${nshmp_haz_ws_version} ../nshmp-haz-ws
+# Download all required repositories. See docker.sh
+RUN cd .. && bash ${builder_workdir}/docker.sh && pwd && ls
 
 # Build nshmp-site-ws
-RUN ./gradlew assemble 
+RUN ./gradlew assemble
 
 ####
 # Application Image: Tomcat

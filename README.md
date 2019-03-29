@@ -53,16 +53,16 @@ When building the Docker image the version, branch, or commit may be supplied as
 to specify nshmp-haz and nshmp-haz-ws versions.
 
 ```bash
-docker run -p PORT:8080 -d \
-  nshmp_haz_version=some-version-or-branch-or-commit \
-  nshmp_haz_ws_version=some-version-or-branch-or-commit \
-  nshmp/nshmp-site-ws
+docker build \
+  --build-arg NSHMP_HAZ_VERSION=some-version-or-branch-or-commit \
+  --build-arg NSHMP_HAZ_WS_VERSION=some-version-or-branch-or-commit \
+  -t IMAGE:IMAGE_TAG .
 
 # Example
-docker run -p 8080:8080 -d \
-  nshmp_haz_version=v1.1.4 \
-  nshmp_haz_ws_version=v1.1.2 \
-  nshmp/nshmp-site-ws
+docker build \
+  --build-arg NSHMP_HAZ_VERSION=v1.1.6 \
+  --build-arg NSHMP_HAZ_WS_VERSION=v1.2.0 \
+  -t nshmp-site-ws:latest .
 ```
 
 ## Development
