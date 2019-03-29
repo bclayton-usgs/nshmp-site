@@ -15,7 +15,7 @@ download_repo() {
 
   printf "\n Downloading [${url}] \n"
   curl -L ${url} | tar -xz
-  mv ${repo}-${version} ${repo}
+  mv ${repo}-${version#v*} ${repo}
 }
 
 # Download nshmp-haz
