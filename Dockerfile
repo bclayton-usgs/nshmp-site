@@ -33,7 +33,7 @@ COPY . ${builder_workdir}/.
 RUN apk add --no-cache git curl bash
 
 # Download all required repositories. See docker.sh
-RUN cd .. && bash ${builder_workdir}/docker.sh && pwd && ls
+RUN cd .. && bash ${builder_workdir}/docker.sh
 
 # Build nshmp-site-ws
 RUN ./gradlew assemble
