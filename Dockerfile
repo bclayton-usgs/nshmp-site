@@ -54,5 +54,8 @@ ARG war_path
 # Copy WAR file from builder image
 COPY --from=builder ${war_path} ${CATALINA_HOME}/webapps/.
 
+# Expose port
+EXPOSE 8080
+
 # Run tomcat
 ENTRYPOINT ${CATALINA_HOME}/bin/catalina.sh run
