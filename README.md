@@ -38,7 +38,6 @@ http://localhost:8080/nshmp-site-ws/basin
 
 The `PORT` should be replaced with the same value to start the container.
 
-
 ### Building
 A Docker image may additionaly be built from the source using the accompanying Dockerfile:
 ```bash
