@@ -16,14 +16,14 @@ NOTE: When "model" is not supplied in the query string, the default model is use
 ## Docker
 The nshmp-site-ws application may be run as a Docker container.
 A public image is available on Docker Hub at
-[https://hub.docker.com/r/nshmp/nshmp-site-ws](https://hub.docker.com/r/nshmp/nshmp-site-ws)
+[https://hub.docker.com/r/usgsnshmp/nshmp-site-ws](https://hub.docker.com/r/usgsnshmp/nshmp-site-ws)
 which can be run with:
 
 ```bash
-docker run -p PORT:8080 -d nshmp/nshmp-site-ws
+docker run -p PORT:8080 -d usgsnshmp/nshmp-site-ws
 
 # Example
-docker run -p 8080:8080 -d nshmp/nshmp-site-ws
+docker run -p 8080:8080 -d usgsnshmp/nshmp-site-ws
 ```
 
 `PORT` should be replaced with an available port that is not in use. The application 
