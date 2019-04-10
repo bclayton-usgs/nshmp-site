@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Throwables;
+
 import gov.usgs.earthquake.nshmp.geo.Location;
 import gov.usgs.earthquake.nshmp.util.Maths;
 
@@ -56,7 +58,7 @@ class ArcGis {
 
       return result;
     } catch (IOException ioe) {
-      throw new RuntimeException("Could not reach: " + urlStr);
+      throw new RuntimeException("Could not reach: " + urlStr + "\n\n" + Throwables.getStackTraceAsString(ioe));
     } catch (IndexOutOfBoundsException e) {
       throw new RuntimeException("Empty results array returned from: " + urlStr);
     }
