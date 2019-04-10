@@ -84,7 +84,7 @@ public class BasinTermService extends NshmpServlet {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      response.getWriter().print(errorMessage(urlHelper.url, e, false));
+      response.getWriter().print(errorMessage(urlHelper.url, e, true));
     }
   }
 
