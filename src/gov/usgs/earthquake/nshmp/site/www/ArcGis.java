@@ -58,7 +58,7 @@ class ArcGis {
 
       return result;
     } catch (IOException ioe) {
-      throw new RuntimeException("Could not reach: " + urlStr + "\n\n" + Throwables.getStackTraceAsString(ioe));
+      throw new RuntimeException("Could not reach: " + urlStr + "\n\n\n" + Throwables.getStackTraceAsString(ioe) + "\n\n\n");
     } catch (IndexOutOfBoundsException e) {
       throw new RuntimeException("Empty results array returned from: " + urlStr);
     }
