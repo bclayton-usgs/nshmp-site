@@ -70,7 +70,7 @@ public class Basins implements Iterable<Basins.BasinRegion> {
       URL url = Basins.class.getResource(BASIN_FILE);
       String json = Resources.toString(url, StandardCharsets.UTF_8);
 
-      FeatureCollection fc = GeoJson.fromJson(url);
+      FeatureCollection fc = GeoJson.from(url).toFeatureCollection();
 
       ImmutableList.Builder<BasinRegion> basinBuilder = ImmutableList.builder();
 
