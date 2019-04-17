@@ -119,7 +119,7 @@ public class BasinTermService extends NshmpServlet {
      * error by handling processing the z2p5, regardless of basin, and only then
      * process z1p0.
      */
-    if (requestData.basinRegion.id.equals("pugetLowland") && z2p5 != null) {
+    if (requestData.basinRegion.id.equals("puget-lowland") && z2p5 != null) {
       z1p0 =
           0.5 * (0.1146 * z2p5 + 0.2826) +
               0.5 * (0.0933 * z2p5 + 0.1444);
