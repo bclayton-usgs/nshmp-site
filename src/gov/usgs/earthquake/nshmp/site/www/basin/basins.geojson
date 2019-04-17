@@ -17,7 +17,7 @@
       },
       "properties": {
         "title": "Los Angeles Basin",
-        "id": "losAngelesBasin",
+        "id": "los-angeles",
         "defaultModel": "cvms426m01"
       }
     },
@@ -46,7 +46,7 @@
       },
       "properties": {
         "title": "Bay Area",
-        "id": "bayArea",
+        "id": "bay-area",
         "defaultModel": "bayarea"
       }
     },
@@ -67,7 +67,7 @@
       },
       "properties": {
         "title": "Wasatch Front",
-        "id": "wasatchFront",
+        "id": "wasatch-front",
         "defaultModel": "Wasatch"
       }
     },
@@ -99,7 +99,7 @@
       },
       "properties": {
         "title": "Puget Lowland",
-        "id": "pugetLowland",
+        "id": "puget-lowland",
         "defaultModel": "Seattle"
       }
     }
