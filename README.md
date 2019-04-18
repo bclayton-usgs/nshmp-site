@@ -21,8 +21,6 @@ See [data](src/gov/usgs/earthquake/nshmp/site/www/data).
 * /nshmp-site-ws/basin/local-data?latitude={latitude}&longitude={longitude}
 * Example: /nshmp-site-ws/basin/local-data?latitude=47.2&longitude=-122.5
 
-
-
 ## Docker
 The nshmp-site-ws application may be run as a Docker container.
 A public image is available on Docker Hub at
