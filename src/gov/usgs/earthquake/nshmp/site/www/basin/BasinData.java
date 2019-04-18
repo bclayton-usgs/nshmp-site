@@ -96,7 +96,7 @@ public class BasinData {
    * @param loc Location inside basin
    */
   public BasinValues getBasinValues(Basin basin, Location loc) {
-    Map<Location, BasinValues> basinRecords = basinData.get(basin);
+    Map<Location, BasinValues> basinRecords = getBasinData(basin);
     checkState(basinRecords != null, "Basin [%s] not supported", basin.id);
 
     double lat = Maths.round(loc.lat(), BASIN_DATA_SPACING);
