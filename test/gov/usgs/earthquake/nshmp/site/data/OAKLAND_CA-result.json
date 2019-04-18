@@ -1,11 +1,11 @@
 {
   "status": "success",
   "name": "Basin Term Service",
-  "date": "Tue Nov 13 14:24:09 MST 2018",
-  "url": "http://localhost:8080/nshmp-site-ws/basin?latitude=37.8&longitude=-122.25",
+  "date": "Thu Apr 18 16:24:22 UTC 2019",
+  "url": "http://localhost:8080/nshmp-site-ws/basin/arc-data?latitude=37.8&longitude=-122.25",
   "request": {
     "latitude": 37.8,
-    "longitude": -122.24,
+    "longitude": -122.25,
     "basinModel": {
       "id": "bayarea",
       "z1p0": "z1p0bayarea",
@@ -13,7 +13,7 @@
     },
     "basinRegion": {
       "title": "Bay Area",
-      "id": "bayArea"
+      "id": "bay-area"
     }
   },
   "response": {
@@ -23,7 +23,7 @@
     },
     "z2p5": {
       "model": "z2p5bayarea",
-      "value": 0.9
+      "value": 0.85
     }
   }
 }

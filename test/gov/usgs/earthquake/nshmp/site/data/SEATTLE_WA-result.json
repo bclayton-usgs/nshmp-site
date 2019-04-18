@@ -1,8 +1,8 @@
 {
   "status": "success",
   "name": "Basin Term Service",
-  "date": "Tue Nov 13 14:24:09 MST 2018",
-  "url": "http://localhost:8080/nshmp-site-ws/basin?latitude=47.6&longitude=-122.3",
+  "date": "Thu Apr 18 16:24:22 UTC 2019",
+  "url": "http://localhost:8080/nshmp-site-ws/basin/arc-data?latitude=47.6&longitude=-122.3",
   "request": {
     "latitude": 47.6,
     "longitude": -122.3,
@@ -13,17 +13,17 @@
     },
     "basinRegion": {
       "title": "Puget Lowland",
-      "id": "pugetLowland"
+      "id": "puget-lowland"
     }
   },
   "response": {
     "z1p0": {
       "model": "z1p0Seattle",
-      "value": 0.9109363843716498
+      "value": 0.910935893
     },
     "z2p5": {
       "model": "z2p5Seattle",
-      "value": 6.7093447269999995
+      "value": 6.70934
     }
   }
 }
