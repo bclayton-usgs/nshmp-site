@@ -23,9 +23,9 @@ import gov.usgs.earthquake.nshmp.util.Maths;
 /**
  * Read in all basin data from data directory.
  * 
- * <p> Use {@link BasinDataTest#getBasinData(Basins)} to read in all basin data.
+ * <p> Use {@link BasinData#getBasinData(Basins)} to read in all basin data.
  * 
- * <p> Use {@link BasinDataTest#getBasinValues(String, Location)} to get
+ * <p> Use {@link BasinData#getBasinValues(String, Location)} to get
  * {@code BasinValues} associated with a basin and {@code Location}.
  * 
  * @author Brandon Clayton
@@ -50,7 +50,7 @@ public class BasinData {
     ImmutableMap.Builder<Basin, ImmutableMap<Location, BasinValues>> basinData = ImmutableMap.builder();
 
     for (BasinRegion region : basins) {
-      URL url = BasinDataTest.class.getResource("../data/" + region.basin.id + ".csv");
+      URL url = BasinData.class.getResource("../data/" + region.basin.id + ".csv");
       Path dataPath = Paths.get(url.getPath());
 
       Csv csv = Csv.create(dataPath);
