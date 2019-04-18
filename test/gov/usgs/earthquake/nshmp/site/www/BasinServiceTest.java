@@ -107,7 +107,7 @@ public class BasinServiceTest {
 
   private static void writeExpected(NshmpSite site) throws Exception {
     Response svcResponse = generateActual(site);
-    String result = BasinUtil.GSON.toJson(svcResponse, Response.class);
+    String result = BasinUtil.GSON.toJson(svcResponse, Response.class) + "\n";
     Path resultPath = DATA_PATH.resolve(site.id() + RESULT_SUFFIX);
     Files.write(resultPath, result.getBytes());
   }
