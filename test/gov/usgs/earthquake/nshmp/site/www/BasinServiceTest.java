@@ -32,8 +32,8 @@ import gov.usgs.earthquake.nshmp.site.www.BasinTermService.Response;
  * Check basin term service.
  * 
  * <p> To run tests: Must have a config.properties file in root of source folder
- * with a "service_host" field that defines where the basin service is
- * deployed. Example: service_host = http://localhost:8080
+ * with a "service_host" field that defines where the basin service is deployed.
+ * Example: service_host = http://localhost:8080
  * 
  * @author Brandon Clayton
  */
