@@ -4,6 +4,7 @@ services:
   nshmp-site-ws:
     # nshmp-site-ws image
     image: usgsnshmp/nshmp-site-ws:latest
+    container_name: nshmp-site-ws
 
     # Restart always
     restart: always
