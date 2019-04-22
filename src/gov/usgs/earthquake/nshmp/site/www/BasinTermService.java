@@ -10,16 +10,20 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import gov.usgs.earthquake.nshmp.geo.Location;
 import gov.usgs.earthquake.nshmp.site.www.ArcGis.ArcGisResult;
 import gov.usgs.earthquake.nshmp.site.www.BasinUtil.Key;
+import gov.usgs.earthquake.nshmp.site.www.basin.Basin;
+import gov.usgs.earthquake.nshmp.site.www.basin.BasinData;
 import gov.usgs.earthquake.nshmp.site.www.basin.BasinModel;
+import gov.usgs.earthquake.nshmp.site.www.basin.BasinValues;
+import gov.usgs.earthquake.nshmp.site.www.basin.BasinValues.BasinValue;
 import gov.usgs.earthquake.nshmp.site.www.basin.Basins;
 import gov.usgs.earthquake.nshmp.site.www.basin.Basins.BasinRegion;
 import gov.usgs.earthquake.nshmp.util.Maths;
@@ -29,10 +33,15 @@ import gov.usgs.earthquake.nshmp.www.meta.ParamType;
 import gov.usgs.earthquake.nshmp.www.meta.Status;
 
 /**
- * Basin term service, internally calls an ArcGIS online service. The ArcGis
- * host server needs to be identified in a config.properties file at the root of
- * the source directory, for example:
- * {@code arcgis_host=https://some.agol.server}
+ * Basin term service to return z1p0 and z2p5 values.
+ * 
+ * The basin term service can return values from the ArcGIS service
+ * (/basin/arc-data) or by using the local files (/basin/local-data) in the data
+ * directory.
+ * 
+ * <p> Note: When using the ArcGis service route the host server needs to be
+ * identified in a config.properties file at the root of the source directory,
+ * for example: {@code arcgis_host=https://some.agol.server}
  * 
  * <p> Note: If the latitude and longitude supplied in the query is not
  * contained in a basin region the resulting z1p0 and z2p5 values are set to
@@ -54,6 +63,8 @@ public class BasinTermService extends NshmpServlet {
 
   private static final Basins BASINS = Basins.getBasins();
 
+  private static final BasinData BASIN_DATA = BasinData.readBasinData(BASINS);
+
   private static final String SERVICE_NAME = "Basin Term Service";
 
   private static final String SERVICE_DESCRIPTION = "Get basin terms";
@@ -74,25 +85,46 @@ public class BasinTermService extends NshmpServlet {
     try {
       if (!isNullOrEmpty(pathInfo) && pathInfo.equals("/geojson")) {
         response.getWriter().print(BASINS.json());
-      } else if (isNullOrEmpty(query)) {
-        final String usage = GSON.toJson(new Metadata());
-        urlHelper.writeResponse(usage);
-      } else {
-        Response svcResponse = processBasinTerm(request, urlHelper);
+      } else if (!isNullOrEmpty(pathInfo) && pathInfo.equals("/local-data")) {
+        Response svcResponse = processBasinTermWithLocalData(request, urlHelper);
         String json = GSON.toJson(svcResponse);
         urlHelper.writeResponse(json);
+      } else if (!isNullOrEmpty(query) && pathInfo.equals("/arc-data")) {
+        Response svcResponse = processBasinTermWithArcGIS(request, urlHelper);
+        String json = GSON.toJson(svcResponse);
+        urlHelper.writeResponse(json);
+      } else {
+        final String usage = GSON.toJson(new Metadata());
+        urlHelper.writeResponse(usage);
       }
     } catch (Exception e) {
       e.printStackTrace();
-      response.getWriter().print(errorMessage(urlHelper.url, e, true));
+      response.getWriter().print(errorMessage(urlHelper.url, e, false));
     }
   }
 
-  private Response processBasinTerm(
-      HttpServletRequest request,
-      UrlHelper urlHelper) {
+  /**
+   * Process request using local basin data.
+   */
+  private Response processBasinTermWithLocalData(HttpServletRequest request, UrlHelper urlHelper) {
+    RequestData requestData = buildRequest(request, BasinData.BASIN_DATA_SPACING);
 
-    RequestData requestData = buildRequest(request);
+    if (requestData.basinRegion == null) {
+      return processNullResult(requestData, urlHelper);
+    }
+
+    Location loc = Location.create(requestData.latitude, requestData.longitude);
+    Basin basin = Basin.fromId(requestData.basinRegion.id);
+    BasinValues basinValues = BASIN_DATA.getBasinValues(basin, loc);
+
+    return new Response(requestData, basinValues, urlHelper);
+  }
+
+  /**
+   * Process request using ArcGIS service.
+   */
+  private Response processBasinTermWithArcGIS(HttpServletRequest request, UrlHelper urlHelper) {
+    RequestData requestData = buildRequest(request, ArcGis.ROUND_MODEL);
 
     if (requestData.basinRegion == null) {
       return processNullResult(requestData, urlHelper);
@@ -104,6 +136,7 @@ public class BasinTermService extends NshmpServlet {
 
     Double z2p5 = arcGisResult.basinModels.get(requestData.basinModel.z2p5) / 1000.0;
     Double z1p0;
+    Basin basin = Basin.fromId(requestData.basinRegion.id);
 
     /*
      * Seattle is a special case where z1p0 is returned as a converted z2p5
@@ -119,7 +152,7 @@ public class BasinTermService extends NshmpServlet {
      * error by handling processing the z2p5, regardless of basin, and only then
      * process z1p0.
      */
-    if (requestData.basinRegion.id.equals("puget-lowland") && z2p5 != null) {
+    if (basin.equals(Basin.PUGET_LOWLAND) && z2p5 != null) {
       z1p0 =
           0.5 * (0.1146 * z2p5 + 0.2826) +
               0.5 * (0.0933 * z2p5 + 0.1444);
@@ -127,31 +160,31 @@ public class BasinTermService extends NshmpServlet {
       z1p0 = arcGisResult.basinModels.get(requestData.basinModel.z1p0) / 1000.0;
     }
 
-    BasinResponse z1p0resp = new BasinResponse(requestData.basinModel.z1p0, z1p0);
-    BasinResponse z2p5resp = new BasinResponse(requestData.basinModel.z2p5, z2p5);
+    BasinValue z1p0resp = new BasinValue(requestData.basinModel.z1p0, z1p0);
+    BasinValue z2p5resp = new BasinValue(requestData.basinModel.z2p5, z2p5);
 
-    ResponseData responseData = new ResponseData(z1p0resp, z2p5resp);
+    BasinValues responseData = new BasinValues(z1p0resp, z2p5resp);
 
-    return new Response(requestData, responseData, arcGisResult, urlHelper);
+    return new Response(requestData, responseData, urlHelper);
   }
 
   private static Response processNullResult(
       RequestData requestData,
       UrlHelper urlHelper) {
-    BasinResponse z1p0 = new BasinResponse("", null);
-    BasinResponse z2p5 = new BasinResponse("", null);
+    BasinValue z1p0 = new BasinValue("", null);
+    BasinValue z2p5 = new BasinValue("", null);
 
-    ResponseData responseData = new ResponseData(z1p0, z2p5);
+    BasinValues responseData = new BasinValues(z1p0, z2p5);
 
-    return new Response(requestData, responseData, null, urlHelper);
+    return new Response(requestData, responseData, urlHelper);
   }
 
-  private static RequestData buildRequest(HttpServletRequest request) {
+  private static RequestData buildRequest(HttpServletRequest request, double roundTo) {
     double latitude = readDouble(Key.LATITUDE, request);
     double longitude = readDouble(Key.LONGITUDE, request);
 
-    latitude = Maths.round(latitude, ArcGis.ROUND_MODEL);
-    longitude = Maths.round(longitude, ArcGis.ROUND_MODEL);
+    latitude = Maths.round(latitude, roundTo);
+    longitude = Maths.round(longitude, roundTo);
 
     BasinRegion basinRegion = BASINS.findRegion(latitude, longitude);
 
@@ -192,32 +225,12 @@ public class BasinTermService extends NshmpServlet {
     final String id;
 
     BasinRegionRequest(BasinRegion basinRegion) {
-      this.title = basinRegion.title;
-      this.id = basinRegion.id;
+      title = basinRegion.title;
+      id = basinRegion.basin.id;
     }
 
     private static BasinRegionRequest getBasinRegionRequest(BasinRegion basinRegion) {
       return basinRegion == null ? null : new BasinRegionRequest(basinRegion);
-    }
-  }
-
-  private static class BasinResponse {
-    final String model;
-    final Double value;
-
-    BasinResponse(String model, Double value) {
-      this.model = model;
-      this.value = value;
-    }
-  }
-
-  private static class ResponseData {
-    final BasinResponse z1p0;
-    final BasinResponse z2p5;
-
-    ResponseData(BasinResponse z1p0, BasinResponse z2p5) {
-      this.z1p0 = z1p0;
-      this.z2p5 = z2p5;
     }
   }
 
@@ -227,13 +240,11 @@ public class BasinTermService extends NshmpServlet {
     final String date;
     final String url;
     final RequestData request;
-    final ResponseData response;
-    transient final ArcGisResult arcGisResponse;
+    final BasinValues response;
 
     Response(
         RequestData requestData,
-        ResponseData responseData,
-        ArcGisResult arcGisResponse,
+        BasinValues responseData,
         UrlHelper urlHelper) {
       this.status = Status.SUCCESS.toString();
       this.name = SERVICE_NAME;
@@ -241,7 +252,6 @@ public class BasinTermService extends NshmpServlet {
       this.url = urlHelper.url;
       this.request = requestData;
       this.response = responseData;
-      this.arcGisResponse = arcGisResponse;
     }
   }
 

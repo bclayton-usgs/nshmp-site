@@ -98,14 +98,14 @@ public class Basins implements Iterable<Basins.BasinRegion> {
   /** Container for a basin region. */
   public static class BasinRegion {
     public final String title;
-    public final String id;
+    public final Basin basin;
     public final BasinModel defaultModel;
     public final Region region;
 
     private BasinRegion(Feature feature) {
       Properties properties = feature.properties();
       title = properties.getString("title");
-      id = properties.getString("id");
+      basin = Basin.fromId(properties.getString("id"));
       String modelId = properties.getString("defaultModel");
       defaultModel = BasinModel.fromId(modelId);
       region = Regions.create(

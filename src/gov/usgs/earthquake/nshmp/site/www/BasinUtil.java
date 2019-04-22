@@ -43,7 +43,7 @@ class BasinUtil {
       Properties props = new Properties();
       InputStream config = BasinUtil.class.getResourceAsStream("/config.properties");
       props.load(config);
-      SERVICE_URL = props.getProperty("service_host") + "/nshmp-site-ws/basin";
+      SERVICE_URL = props.getProperty("service_host") + "/nshmp-site-ws/basin/arc-data";
       ARCGIS_HOST = props.getProperty("arcgis_host");
     } catch (IOException e) {
       e.printStackTrace();

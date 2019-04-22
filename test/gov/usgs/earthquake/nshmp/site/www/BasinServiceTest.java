@@ -32,8 +32,8 @@ import gov.usgs.earthquake.nshmp.site.www.BasinTermService.Response;
  * Check basin term service.
  * 
  * <p> To run tests: Must have a config.properties file in root of source folder
- * with a "service_host" field that defines where the basin service is
- * deployed. Example: service_host = http://localhost:8080
+ * with a "service_host" field that defines where the basin service is deployed.
+ * Example: service_host = http://localhost:8080
  * 
  * @author Brandon Clayton
  */
@@ -107,7 +107,7 @@ public class BasinServiceTest {
 
   private static void writeExpected(NshmpSite site) throws Exception {
     Response svcResponse = generateActual(site);
-    String result = BasinUtil.GSON.toJson(svcResponse, Response.class);
+    String result = BasinUtil.GSON.toJson(svcResponse, Response.class) + "\n";
     Path resultPath = DATA_PATH.resolve(site.id() + RESULT_SUFFIX);
     Files.write(resultPath, result.getBytes());
   }

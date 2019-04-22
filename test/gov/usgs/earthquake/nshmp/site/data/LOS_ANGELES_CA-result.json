@@ -1,11 +1,11 @@
 {
   "status": "success",
   "name": "Basin Term Service",
-  "date": "Tue Nov 13 14:24:08 MST 2018",
-  "url": "http://localhost:8080/nshmp-site-ws/basin?latitude=34.05&longitude=-118.25",
+  "date": "Thu Apr 18 16:54:28 UTC 2019",
+  "url": "http://localhost:8080/nshmp-site-ws/basin/arc-data?latitude=34.05&longitude=-118.25",
   "request": {
-    "latitude": 34.04,
-    "longitude": -118.24,
+    "latitude": 34.05,
+    "longitude": -118.25,
     "basinModel": {
       "id": "cvms426m01",
       "z1p0": "z1p0cvms426m01",
@@ -13,7 +13,7 @@
     },
     "basinRegion": {
       "title": "Los Angeles Basin",
-      "id": "losAngelesBasin"
+      "id": "los-angeles"
     }
   },
   "response": {
@@ -23,7 +23,7 @@
     },
     "z2p5": {
       "model": "z2p5cvms426m01",
-      "value": 2.17
+      "value": 2.101
     }
   }
 }

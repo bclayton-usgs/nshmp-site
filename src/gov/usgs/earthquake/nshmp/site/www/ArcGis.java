@@ -1,5 +1,7 @@
 package gov.usgs.earthquake.nshmp.site.www;
 
+import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,8 +11,6 @@ import java.util.Map;
 
 import gov.usgs.earthquake.nshmp.geo.Location;
 import gov.usgs.earthquake.nshmp.util.Maths;
-
-import static gov.usgs.earthquake.nshmp.site.www.BasinUtil.GSON;
 
 /**
  * Wrapper around the supporting ArcGIS online basin data service.

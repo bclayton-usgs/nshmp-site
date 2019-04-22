@@ -3,10 +3,8 @@ version: "3"
 services:
   nshmp-site-ws:
     # nshmp-site-ws image
-    image: nshmp/nshmp-site-ws:latest
-
-    # Build this directory
-    build: .
+    image: usgsnshmp/nshmp-site-ws:latest
+    container_name: nshmp-site-ws-docker-compose
 
     # Restart always
     restart: always

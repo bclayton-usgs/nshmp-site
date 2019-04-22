@@ -7,11 +7,19 @@
 * /nshmp-site-ws/basin/geojson
 
 ## Obtaining basin terms
-* /nshmp-site-ws/basin?latitude={latitude}&longitude={longitude}&model={basinModel}
-* Example: /nshmp-site-ws/basin?latitude=47.2&longitude=-122.5&model=Seattle
-* Example: /nshmp-site-ws/basin?latitude=47.2&longitude=-122.5
+
+### Using ArcGIS data
+* /nshmp-site-ws/basin/arc-data?latitude={latitude}&longitude={longitude}&model={basinModel}
+* Example: /nshmp-site-ws/basin/arc-data?latitude=47.2&longitude=-122.5&model=Seattle
+* Example: /nshmp-site-ws/basin/arc-data?latitude=47.2&longitude=-122.5
 
 NOTE: When "model" is not supplied in the query string, the default model is used that is defined in the usage.
+
+### Using Local Data
+See [data](src/gov/usgs/earthquake/nshmp/site/www/data).
+
+* /nshmp-site-ws/basin/local-data?latitude={latitude}&longitude={longitude}
+* Example: /nshmp-site-ws/basin/local-data?latitude=47.2&longitude=-122.5
 
 ## Docker
 The nshmp-site-ws application may be run as a Docker container.
