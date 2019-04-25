@@ -32,7 +32,7 @@ import gov.usgs.earthquake.nshmp.util.Maths;
  */
 public class BasinData {
 
-  public static final double BASIN_DATA_SPACING = 0.05;
+  public static final double BASIN_DATA_SPACING = 0.01;
 
   private ImmutableMap<Basin, ImmutableMap<Location, BasinValues>> basinData;
 
