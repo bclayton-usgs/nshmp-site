@@ -4,7 +4,7 @@ services:
   nshmp-site-ws:
     # nshmp-site-ws image
     image: usgsnshmp/nshmp-site-ws:latest
-    container_name: nshmp-site-ws-docker-compose
+    container_name: nshmp-site-ws__docker-compose
 
     # Restart always
     restart: always
