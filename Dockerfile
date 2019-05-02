@@ -51,37 +51,16 @@ RUN cd .. && bash ${builder_workdir}/docker-builder-entrypoint.sh
 RUN ./gradlew assemble
 
 ####
-# Application Image: usgs/centos 
-#   - Intall Java 8 and Tomcat
+# Application Image: usgsnshmp/nshmp-tomcat:8.5-jre8
 #   - Copy WAR file from builder image
-#   - Run Tomcat
 ####
-FROM usgs/centos
+FROM usgsnshmp/nshmp-tomcat:8.5-jre8
 
 # Set author
 LABEL maintainer="Brandon Clayton <bclayton@usgs.gov>"
-
-# Tomcat home
-ENV CATALINA_HOME "/usr/local/tomcat"
-
-# Tomcat version to download
-ARG tomcat_major=8
-ARG tomcat_version=8.5.39
-ARG tomcat_source=http://archive.apache.org/dist/tomcat
-
-# Install Java 8 and Tomcat 8
-RUN yum install -y java-1.8.0-openjdk-devel \
-  && curl -L ${tomcat_source}/tomcat-${tomcat_major}/v${tomcat_version}/bin/apache-tomcat-${tomcat_version}.tar.gz | tar -xz \
-  && mv apache-tomcat-${tomcat_version} ${CATALINA_HOME}
 
 # Get WAR path
 ARG war_path
 
 # Copy WAR file from builder image
-COPY --from=builder ${war_path} ${CATALINA_HOME}/webapps/.
-
-# Expose port
-EXPOSE 8080
-
-# Run tomcat
-ENTRYPOINT ${CATALINA_HOME}/bin/catalina.sh run
+COPY --from=builder ${war_path} ${TOMCAT_WEBAPPS}/ 
