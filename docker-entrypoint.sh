@@ -20,7 +20,6 @@ readonly USAGE="
   docker run -p <PORT>:8080 -d usgs/nshmp-site-ws
 ";
 
-
 ####
 # Build and deploy nshmp-site-ws.
 # Globals:
