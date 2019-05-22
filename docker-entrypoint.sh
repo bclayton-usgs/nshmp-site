@@ -9,7 +9,19 @@
 set -o errexit;
 set -o errtrace;
 
+env
+
+# Import bash functions
+. ${BASH_FUNCTIONS}; 
+
+# Log file
 readonly LOG_FILE="docker-entrypoint.log";
+
+# Docker usage
+readonly USAGE="
+  docker run -p <PORT>:8080 -d usgs/nshmp-site-ws
+";
+
 
 ####
 # Build and deploy nshmp-site-ws.
@@ -17,6 +29,7 @@ readonly LOG_FILE="docker-entrypoint.log";
 #   (string) LOG_FILE - The log file
 #   (string) TOMCAT_WEBAPPS - Path to Tomcat webapps directory
 #   (string) WAR_PATH - Path to nshmp-haz-ws.war
+#   (string) USAGE - The Docker usage
 # Arguments:
 #   None
 # Returns:
@@ -24,7 +37,7 @@ readonly LOG_FILE="docker-entrypoint.log";
 ####
 main() {
   # Set trap for uncaught errors
-  trap 'error_exit "${BASH_COMMAND}" "$(< ${LOG_FILE})"' ERR;
+  trap 'error_exit "${BASH_COMMAND}" "$(< ${LOG_FILE})" "${USAGE}"' ERR;
 
   # Download repositories
   download_repos;
@@ -37,25 +50,6 @@ main() {
 
   # Run tomcat
   catalina.sh run;
-}
-
-####
-# Download a USGS repository from Github.
-# Arguments:
-#   (string) repo - The project to download
-#   (string) version - The version to download
-# Returns:
-#   None
-####
-download_repo() {
-  local repo=${1};
-  local version=${2};
-  local url="https://github.com/usgs/${repo}/archive/${version}.tar.gz";
-
-  printf "\n Downloading [${url}] \n";
-  curl -L ${url} | tar -xz 2> ${LOG_FILE} || \
-      error_exit "Could not download [${url}]" "$(< ${LOG_FILE})";
-  mv ${repo}-${version#v*} ${repo};
 }
 
 ####
@@ -75,48 +69,12 @@ download_repos() {
   cd ${HOME} 2> ${LOG_FILE};
 
   # Download nshmp-haz
-  download_repo "nshmp-haz" ${NSHMP_HAZ_VERSION};
+  download_repo "usgs" "nshmp-haz" ${NSHMP_HAZ_VERSION};
 
   # Download nshmp-haz-ws
-  download_repo "nshmp-haz-ws" ${NSHMP_HAZ_WS_VERSION};
+  download_repo "usgs" "nshmp-haz-ws" ${NSHMP_HAZ_WS_VERSION};
 
   cd ${WORKDIR} 2> ${LOG_FILE};
-}
-
-####
-# Exit script with error.
-# Globals:
-#   None
-# Arguments:
-#   (string) message - The error message
-#   (string) logs - The log for the error
-# Returns:
-#   None
-####
-error_exit() {
-  local usage="
-    docker run -p <PORT>:8080 -d usgs/nshmp-site-ws
-  ";
-
-  local message="
-    nshmp-haz Docker error:
-    ${1}
-
-    ----------
-    Logs:
-
-    ${2}
-
-    ----------
-    Usage:
-
-    ${usage}
-
-  ";
-
-  printf "${message}";
-
-  exit -1;
 }
 
 ####
