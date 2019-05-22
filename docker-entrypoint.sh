@@ -9,8 +9,6 @@
 set -o errexit;
 set -o errtrace;
 
-env
-
 # Import bash functions
 . ${BASH_FUNCTIONS}; 
 
