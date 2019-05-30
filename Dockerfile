@@ -16,12 +16,12 @@
 
 
 ####
-# Application Image: usgsnshmp/nshmp-tomcat:8.5-jre8
+# Application Image: usgsnshmp/tomcat:8.5-jre8
 #   - Download nshmp-haz and nshmp-haz-ws
 #   - Build nshmp-site-ws
 #   - Deploy nshmp-site-ws
 ####
-FROM usgsnshmp/nshmp-tomcat:8.5-jre8
+FROM usgsnshmp/tomcat:8.5-jre8
 
 # Set author
 LABEL maintainer="Brandon Clayton <bclayton@usgs.gov>"
