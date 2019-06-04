@@ -85,7 +85,7 @@ public class BasinTermService extends NshmpServlet {
     try {
       if (!isNullOrEmpty(pathInfo) && pathInfo.equals("/geojson")) {
         response.getWriter().print(BASINS.json());
-      } else if (!isNullOrEmpty(pathInfo) && pathInfo.equals("/local-data")) {
+      } else if (!isNullOrEmpty(query) && pathInfo.equals("/local-data")) {
         Response svcResponse = processBasinTermWithLocalData(request, urlHelper);
         String json = GSON.toJson(svcResponse);
         urlHelper.writeResponse(json);
