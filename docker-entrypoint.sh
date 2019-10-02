@@ -68,9 +68,6 @@ download_repos() {
   # Download nshmp-haz
   download_repo "usgs" "nshmp-haz" ${NSHMP_HAZ_VERSION};
 
-  # Download nshmp-haz-ws
-  download_repo "usgs" "nshmp-haz-ws" ${NSHMP_HAZ_WS_VERSION};
-
   cd ${WORKDIR} 2> ${LOG_FILE};
 }
 
