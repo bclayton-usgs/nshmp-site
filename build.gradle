@@ -44,7 +44,7 @@ repositories {
 
 dependencies {
   providedCompile 'org.apache.tomcat:tomcat-catalina:8.0.45'
-  compile project(':nshmp-haz-ws')
+  compile project(':nshmp-haz')
   testCompile 'junit:junit:4.12'
 }
 
