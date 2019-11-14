@@ -65,6 +65,9 @@ main() {
 download_repos() {
   cd ${HOME} 2> ${LOG_FILE};
 
+  # Download nshmp-haz-ws
+  download_repo "usgs" "nshmp-haz-ws" ${NSHMP_HAZ_WS_VERSION};
+
   # Download nshmp-haz
   download_repo "usgs" "nshmp-haz" ${NSHMP_HAZ_VERSION};
 
