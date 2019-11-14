@@ -1,3 +1,4 @@
 rootProject.name = 'nshmp-site-ws'
-include 'nshmp-haz'
+include 'nshmp-haz-ws', 'nshmp-haz'
+project(':nshmp-haz-ws').projectDir = new File(settingsDir, '../nshmp-haz-ws')
 project(':nshmp-haz').projectDir = new File(settingsDir, '../nshmp-haz')
