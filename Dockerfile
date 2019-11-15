@@ -55,5 +55,5 @@ RUN yum install -y git
 ENTRYPOINT [ "bash", "docker-entrypoint.sh" ]
 
 # Check service is running
-HEALTHCHECK --interval=10s --timeout=3s \
+HEALTHCHECK --interval=10s --timeout=10s \
   CMD curl -f http://localhost:8080/${PROJECT}/basin || exit 1
